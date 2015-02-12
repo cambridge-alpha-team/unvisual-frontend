@@ -7,6 +7,12 @@ var selectedCubelet;
 var selectedChoice;
 var loopNumber = 1; //to uniquely name loops
 
+function indent(text) {
+  return text.split("\n").map(function(line) {
+    return "    " + line;
+  }).join("\n");
+}
+
 
 //tests--------------
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
@@ -43,11 +49,11 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 });
 
 //shortcut to add a node
-Mousetrap.bind(['command+a', 'ctrl+a'], function() {
+Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 	mode = mode == 1 ? 0 : 1;
 	if (mode == 1) {
 		selectedCodeType = 0;
-		say("adding code");
+		say("what do you want to add?");
 	} else {
 		say("adding code cancelled");
 	}
@@ -57,10 +63,10 @@ Mousetrap.bind(['command+a', 'ctrl+a'], function() {
 });
 
 //shortcut to delete a node
-Mousetrap.bind(['command+d', 'ctrl+d'], function() {
+Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
 	mode = mode == 3 ? 0 : 3;
 	if (mode == 3) {
-		say("Are you sure you want to delete this node? Press right to confirm or left to cancel.");
+		say("Are you sure you want to delete this bit of code? Press right to confirm or left to cancel.");
 	} else {
 		say("delete cancelled");
 	}
@@ -100,15 +106,15 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch(mode) {
 		case 1:	// add code
 			mode = 0;
-			say("adding code cancelled. activeNode is " + activeNode.readName());
+			say("adding code cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
 		case 2:	// select cubelet
 			mode = 0;
-			say("cubelet selection cancelled. activeNode is " + activeNode.readName());
+			say("cubelet selection cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
 		case 3:	// delete
 			mode = 0;
-			say("delete cancelled. activeNode is " + activeNode.readName());
+			say("delete cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
 		case 4: //choices
 			say(activeNode.name + " not changed from " + activeNode.choice);
@@ -193,9 +199,9 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				// Remove activeNode from its parent's list of children
 				parent.children.splice(index, 1);
 				activeNode = parent;
-				say ("Node deleted. activeNode is " + activeNode.readName());
+				say ("Code deleted. the currently selected bit of code is " + activeNode.readName());
 			} else {
-				say("ERROR: activeNode is not recognised as a child by its parent.");
+				say("ERROR: the currently selected bit of code is not recognised as a child by its parent.");
 			}
 			mode = 0;
 			break;
@@ -275,4 +281,49 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 	}
 });
 
+Mousetrap.bind(['*'], function() {
+  request("POST", "/unvisual/rest/osc/stop", "", function() {
+    console.log("Woo, it worked");
+  }, function(err) {
+    console.log("This is a helpful error message");
+  });
+});
+
+
+Mousetrap.bind(['return', 'enter'], function() {
+  var code = root.generateCode();
+  sendCode(code);
+});
+
 document.getElementById("message").innerHTML = root.generateCode();
+
+function sendCode(code) {
+  request("POST", "/unvisual/rest/osc/run", code, function() {
+    console.log("Woo, it worked");
+  }, function(err) {
+    console.log("This is a helpful error message");
+  });
+}
+
+
+var request = function(method, url, body, resolve, reject) {
+  var xhr = new XMLHttpRequest();
+  xhr.open(method, url, true);
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      resolve(xhr.response);
+    } else {
+      reject(new Error("Status code was " + xhr.status));
+    }
+  };
+
+  xhr.onerror = function() {
+    reject(new Error("Can't XHR " + JSON.stringify(url)));
+  };
+
+  xhr.responseType = 'text';
+
+  xhr.send(body);
+};
+
