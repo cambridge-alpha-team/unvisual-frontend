@@ -275,4 +275,49 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 	}
 });
 
+Mousetrap.bind(['+'], function() {
+  request("POST", "/unvisual/rest/osc/stop", "", function() {
+    console.log("Woo, it worked");
+  }, function(err) {
+    console.log("This is a helpful error message");
+  });
+});
+
+
+Mousetrap.bind(['return', 'enter'], function() {
+  var code = root.generateCode();
+  sendCode(code);
+});
+
 document.getElementById("message").innerHTML = root.generateCode();
+
+function sendCode(code) {
+  request("POST", "/unvisual/rest/osc/run", code, function() {
+    console.log("Woo, it worked");
+  }, function(err) {
+    console.log("This is a helpful error message");
+  });
+}
+
+
+var request = function(method, url, body, resolve, reject) {
+  var xhr = new XMLHttpRequest();
+  xhr.open(method, url, true);
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      resolve(xhr.response);
+    } else {
+      reject(new Error("Status code was " + xhr.status));
+    }
+  };
+
+  xhr.onerror = function() {
+    reject(new Error("Can't XHR " + JSON.stringify(url)));
+  };
+
+  xhr.responseType = 'text';
+
+  xhr.send(body);
+};
+
