@@ -96,7 +96,7 @@ Mousetrap.bind(['command+r', 'ctrl+r'], function() {
 });
 
 //shortcut to go out of list
-Mousetrap.bind(['left', 'a'], function() {
+Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch(mode) {
 		case 1:	// add code
 			mode = 0;
@@ -124,7 +124,7 @@ Mousetrap.bind(['left', 'a'], function() {
 });
 
 //shortcut to go into a list
-Mousetrap.bind(['right', 'd'], function() {
+Mousetrap.bind(['right', 'd', 'l'], function() {
 	switch(mode) {
 		case 1:	// add code
 			switch(selectedCodeType) {
@@ -218,7 +218,7 @@ Mousetrap.bind(['right', 'd'], function() {
 });
 
 //shortcut to go to the next element in a list
-Mousetrap.bind(['down', 's'], function() {
+Mousetrap.bind(['down', 's', 'j'], function() {
 	switch(mode) {
 		case 1:	// add code
 			if(selectedCodeType < (codeTypes.length - 1)) {
@@ -247,7 +247,7 @@ Mousetrap.bind(['down', 's'], function() {
 });
 
 //shortcut to go to the previous element in a list
-Mousetrap.bind(['up', 'w'], function() {
+Mousetrap.bind(['up', 'w', 'k'], function() {
 	switch(mode) {
 		case 1:	// add code
 			if(selectedCodeType > 0) {
