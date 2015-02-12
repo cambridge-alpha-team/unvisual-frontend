@@ -43,7 +43,7 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 });
 
 //shortcut to add a node
-Mousetrap.bind(['command+a', 'ctrl+a'], function() {
+Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 	mode = mode == 1 ? 0 : 1;
 	if (mode == 1) {
 		selectedCodeType = 0;
@@ -57,7 +57,7 @@ Mousetrap.bind(['command+a', 'ctrl+a'], function() {
 });
 
 //shortcut to delete a node
-Mousetrap.bind(['command+d', 'ctrl+d'], function() {
+Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
 	mode = mode == 3 ? 0 : 3;
 	if (mode == 3) {
 		say("Are you sure you want to delete this node? Press right to confirm or left to cancel.");
@@ -275,7 +275,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 	}
 });
 
-Mousetrap.bind(['+'], function() {
+Mousetrap.bind(['*'], function() {
   request("POST", "/unvisual/rest/osc/stop", "", function() {
     console.log("Woo, it worked");
   }, function(err) {
