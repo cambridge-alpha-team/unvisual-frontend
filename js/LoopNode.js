@@ -22,9 +22,11 @@ LoopNode.prototype.readName = function() {
 
 LoopNode.prototype.generateCode = function() {
 	var sonicPi = "live_loop :" + this.name + " do\n";
+	sonicPi += "with_bpm tempo do\n";
 	for (var i = 0; i < this.children.length; i++) {
 		sonicPi += (this.children[i].generateCode() + "\n");
 	}
+	sonicPi += "end\n";
 	sonicPi += "end";
 	return sonicPi;
 };
