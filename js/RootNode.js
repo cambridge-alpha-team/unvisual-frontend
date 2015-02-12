@@ -7,7 +7,7 @@ function RootNode() {
 RootNode.prototype.generateCode = function() {
 	
 	var sonicPi = "";
-	for (var i = 0; i <= this.children.length; i++) {
+	for (var i = 0; i < this.children.length; i++) {
 		sonicPi += (this.children[i].generateCode() + "\n");
 	}
 	return sonicPi;

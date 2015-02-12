@@ -21,5 +21,11 @@ SampleNode.prototype.readName = function() {
 };
 
 SampleNode.prototype.generateCode = function() {
-	
+	var sonicPi = "sample :" + this.children[0].generateCode() + " ";
+	for (var i = 1; i < this.children.length; i++) {
+		if(i != 1) sonicPi += ", ";
+		
+		sonicPi += this.children[i].generateCode();
+	}
+	return sonicPi;
 };

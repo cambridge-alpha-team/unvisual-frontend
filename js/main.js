@@ -274,7 +274,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			break;
 	}
 });
-
+/*
 if (!String.prototype.startsWith) {
 	  Object.defineProperty(String.prototype, 'startsWith', {
 	    enumerable: false,
@@ -286,10 +286,6 @@ if (!String.prototype.startsWith) {
 	    }
 	  });
 	}
-
-//takes the root and generates code
-//var tab = 0;
-
 
 function generateCode(node, tab) {
 	var sonicPi = '';
@@ -350,5 +346,6 @@ function generateCode(node, tab) {
 		return sonicPi;
 	}
 }
+*/
 
-document.getElementById("message").innerHTML = generateCode(root, 0);
+document.getElementById("message").innerHTML = root.generateCode();

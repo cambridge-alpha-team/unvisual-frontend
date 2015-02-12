@@ -22,5 +22,11 @@ PlayNode.prototype.readName = function() {
 };
 
 PlayNode.prototype.generateCode = function() {
-	
+	var sonicPi = "play ";
+	for (var i = 0; i < this.children.length; i++) {
+		if(i != 0) sonicPi += ", ";
+		
+		sonicPi += this.children[i].generateCode();
+	}
+	return sonicPi;
 };

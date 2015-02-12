@@ -1,5 +1,4 @@
 function SynthNode(parent, childNumber) {
-	var synthNode = new ApplyNode('synth', parent, childNumber);
 	this.name = 'synth';
 	this.parent = parent || null;
 	this.children = [];
@@ -8,9 +7,7 @@ function SynthNode(parent, childNumber) {
 	} else if(parent != null) {
 		parent.children.push(this);
 	}
-	new ChoiceNode('synth name', synthNode, ['dsaw', 'fm', 'prophet']);
-	
-	return synthNode;
+	new ChoiceNode('synth name', this, ['dsaw', 'fm', 'prophet']);
 }
 
 SynthNode.prototype.readName = function() {

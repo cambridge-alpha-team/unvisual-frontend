@@ -15,5 +15,5 @@ ChoiceNode.prototype.readName = function() {
 };
 
 ChoiceNode.prototype.generateCode = function() {
-	
+	return this.choice;
 };
