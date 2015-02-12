@@ -10,6 +10,18 @@
     <param-value>true</param-value>
   </context-param>
 
+  <!-- this need same with resteasy servlet url-pattern -->
+  <context-param>
+    <param-name>resteasy.servlet.mapping.prefix</param-name>
+    <param-value>/rest</param-value>
+  </context-param>
+
+  <listener>
+    <listener-class>
+      org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
+    </listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>resteasy-servlet</servlet-name>
     <servlet-class>
@@ -19,7 +31,7 @@
 
   <servlet-mapping>
     <servlet-name>resteasy-servlet</servlet-name>
-    <url-pattern>/api/*</url-pattern>
+    <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>
