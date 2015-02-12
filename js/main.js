@@ -88,6 +88,16 @@ Mousetrap.bind(['command+o', 'ctrl+o'], function() {
 	return false;
 });
 
+//shortcut to run code
+Mousetrap.bind(['command+r', 'ctrl+r'], function() {
+	say(generateCode(root, 0));
+	//TODO Send sonicPi string to server
+	
+	// return false to prevent default browser behaviour
+	// and stop event from bubbling
+	return false;
+});
+
 //shortcut to go out of list
 Mousetrap.bind(['left'], function() {
 	switch(mode) {
@@ -281,32 +291,63 @@ if (!String.prototype.startsWith) {
 	}
 
 //takes the root and generates code
-function generateCode(node) {
-	var sonicPi = "";
+var tab = 0;
+
+
+function generateCode(node, tab) {
+	var sonicPi;
+	
+	function tabs(tab){
+		for (var n = 0; n <= tab; n++) {
+			sonicPi += "\t";
+		}
+	}
+		
 	for (child in node.children) {
+		if ((child.name).startsWith("tempo")) {
+			sonicPi += ("with_tempo :" + child.children[0].defaultValue + " do \n");
+			tab++
+			tabs(tab);
+			for (var i = 1; i < child.children.length; i++ ) {
+				generateCode(child.children[i], tab);
+			}
+			tab--;
+			tabs(tab);
+			sonicPi += "end \n";
+		}
 		if ((child.name).startsWith("loop")) {
-			sonicPi = "live_loop :" + child.name + " do \n";
-			(node.children).forEach(generateCode);
+			tabs(tab);
+			sonicPi += ("live_loop :" + child.name + " do \n");
+			tab++;
+			for (var i = 0; i < child.children.length; i++ ) {
+				generateCode(child.children[i], tab);
+			}
+			tab--;
+			tabs(tab);
 			sonicPi += "end \n";
 		} else if ((child.name).startsWith("play")) {
 			//Value Nodes for play, amp, & release
-			sonicPi += ("play " + child.children[0].defaultValue + ", amp: " + child.children[1].defaultValue + ", release: " + child.children[2].defaultValue + "\n");
+			tabs(tab);
+			sonicPi += ("play " + child.children[0].defaultValue + ", amp :" + child.children[1].defaultValue + ", release :" + child.children[2].defaultValue + "\n");
 			
 		} else if ((child.name).startsWith("synth")) {
-			//name
-			sonicPi += ("use_synth: " + child.children[0].choice+ "\n");
+			tabs(tab);
+			sonicPi += ("use_synth :" + child.children[0].choice+ "\n");
 			
 		} else if ((child.name).startsWith("sample")) {
 			//name & amp
+			tabs(tab);
 			sonicPi += ("sample: " + child.children[0].choice + ", amp: " + child.children[1].defautlValue + "\n");
 			
 		} else if ((child.name).startsWith("fx")) {
-			//child 0: fx name
-			//cycle through child 1 to the end
+			tabs(tab);
 			sonicPi += ("with_fx: " + child.children[0].choice + " do \n");
+			tab++;
 			for (var i = 1; i < child.children.length; i++ ){
-				generateCode();
+				generateCode(child.children[i], tab);
 			}
+			tab--;
+			tabs(tab);
 			sonicPi += "end \n";
 		}
 		return sonicPi;
