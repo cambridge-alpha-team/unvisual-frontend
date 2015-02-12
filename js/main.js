@@ -239,13 +239,13 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			say(codeTypes[selectedCodeType]);
 			break;
 		case 2:	// select cubelet
-			if(selectedCubelet < 6) {
+			if(selectedCubelet > 0) {
 				selectedCubelet--;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
 		case 4: //choices
-			if((selectedChoice + 1) < activeNode.choices.length) {
+			if(0 < selectedChoice) {
 				selectedChoice--;
 			}
 			say(activeNode.choices[selectedChoice]);
@@ -269,13 +269,13 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			say(codeTypes[selectedCodeType]);
 			break;
 		case 2:	// select cubelet
-			if(selectedCubelet > 0) {
+			if(selectedCubelet < 6) {
 				selectedCubelet++;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
 		case 4: //choices
-			if(0 < selectedChoice) {
+			if((selectedChoice + 1) < activeNode.choices.length) {
 				selectedChoice++;
 			}
 			say(activeNode.choices[selectedChoice]);
