@@ -45,6 +45,7 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 			selectedCubelet = activeNode.cubelet;
 		}
 	}
+	reGenerate();
 	return false;
 });
 
@@ -57,9 +58,11 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 	} else {
 		say("adding code cancelled");
 	}
+	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
+	
 });
 
 //shortcut to delete a node
@@ -70,14 +73,16 @@ Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
 	} else {
 		say("delete cancelled");
 	}
+	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
+	
 });
 
 //shortcut to save code
 Mousetrap.bind(['command+s', 'ctrl+s'], function() {
-	
+	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
@@ -85,7 +90,7 @@ Mousetrap.bind(['command+s', 'ctrl+s'], function() {
 
 //shortcut to open code
 Mousetrap.bind(['command+o', 'ctrl+o'], function() {
-	
+	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
@@ -93,12 +98,11 @@ Mousetrap.bind(['command+o', 'ctrl+o'], function() {
 
 //shortcut to run code
 Mousetrap.bind(['command+r', 'ctrl+r'], function() {
-	say(generateCode(root, 0));
-	//TODO Send sonicPi string to server
-	
+	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
+	
 });
 
 //shortcut to go out of list
@@ -127,6 +131,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			}
 			break;
 	}
+	reGenerate();
 });
 
 //shortcut to go into a list
@@ -221,6 +226,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			}
 			break;
 	}
+	reGenerate();
 });
 
 //shortcut to go to the next element in a list
@@ -250,6 +256,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			say(activeNode.readName());
 			break;
 	}
+	reGenerate();
 });
 
 //shortcut to go to the previous element in a list
@@ -279,6 +286,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			say(activeNode.readName());
 			break;
 	}
+	reGenerate();
 });
 
 Mousetrap.bind(['*'], function() {
@@ -295,7 +303,14 @@ Mousetrap.bind(['return', 'enter'], function() {
   sendCode(code);
 });
 
-document.getElementById("message").innerHTML = root.generateCode();
+function reGenerate() {
+	document.getElementById("message").innerHTML = '';
+	
+	var code = root.generateCode();
+	var node = document.createTextNode(code);
+	document.getElementById('message').appendChild(node);
+
+}
 
 function sendCode(code) {
   request("POST", "/unvisual/rest/osc/run", code, function() {
