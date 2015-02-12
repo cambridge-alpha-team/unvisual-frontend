@@ -24,7 +24,6 @@ ValueNode.prototype.readName = function() {
 	return this.name + " " + this.choice;
 };
 
-//TODO this needs special cases for name = sleep and tempo
 ValueNode.prototype.generateCode = function() {
 	var sonicPi = "";
 	if(this.name == "sleep") {
