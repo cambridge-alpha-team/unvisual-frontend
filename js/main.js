@@ -47,7 +47,7 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 	mode = mode == 1 ? 0 : 1;
 	if (mode == 1) {
 		selectedCodeType = 0;
-		say("adding code");
+		say("what do you want to add?");
 	} else {
 		say("adding code cancelled");
 	}
@@ -60,7 +60,7 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
 	mode = mode == 3 ? 0 : 3;
 	if (mode == 3) {
-		say("Are you sure you want to delete this node? Press right to confirm or left to cancel.");
+		say("Are you sure you want to delete this bit of code? Press right to confirm or left to cancel.");
 	} else {
 		say("delete cancelled");
 	}
@@ -100,15 +100,15 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch(mode) {
 		case 1:	// add code
 			mode = 0;
-			say("adding code cancelled. activeNode is " + activeNode.readName());
+			say("adding code cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
 		case 2:	// select cubelet
 			mode = 0;
-			say("cubelet selection cancelled. activeNode is " + activeNode.readName());
+			say("cubelet selection cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
 		case 3:	// delete
 			mode = 0;
-			say("delete cancelled. activeNode is " + activeNode.readName());
+			say("delete cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
 		case 4: //choices
 			say(activeNode.name + " not changed from " + activeNode.choice);
@@ -193,9 +193,9 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				// Remove activeNode from its parent's list of children
 				parent.children.splice(index, 1);
 				activeNode = parent;
-				say ("Node deleted. activeNode is " + activeNode.readName());
+				say ("Code deleted. the currently selected bit of code is " + activeNode.readName());
 			} else {
-				say("ERROR: activeNode is not recognised as a child by its parent.");
+				say("ERROR: the currently selected bit of code is not recognised as a child by its parent.");
 			}
 			mode = 0;
 			break;
