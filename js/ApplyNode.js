@@ -17,6 +17,6 @@ ApplyNode.prototype.readName = function() {
 	}
 };
 
-ApplyNode.prototype.remove = function() {
+ApplyNode.prototype.generateCode = function() {
 	
 };

@@ -23,3 +23,7 @@ function ValueNode(name, parent, childNumber, defaultValue, min, max) {
 ValueNode.prototype.readName = function() {
 	return this.name + " " + this.choice;
 };
+
+ValueNode.prototype.generateCode = function() {
+	
+};

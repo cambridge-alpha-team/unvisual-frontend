@@ -13,3 +13,7 @@ function ChoiceNode(name, parent, choices) {
 ChoiceNode.prototype.readName = function() {
 	return this.name + " " + this.choice;
 };
+
+ChoiceNode.prototype.generateCode = function() {
+	
+};

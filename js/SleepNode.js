@@ -18,3 +18,7 @@ SleepNode.prototype.readName = function() {
 		return this.name;
 	}
 };
+
+SleepNode.prototype.generateCode = function() {
+	
+};

@@ -17,3 +17,7 @@ Node.prototype.readName = function() {
 	}
 };
 
+Node.prototype.generateCode = function() {
+	
+};
+

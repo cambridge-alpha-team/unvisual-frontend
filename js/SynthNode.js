@@ -20,3 +20,7 @@ SynthNode.prototype.readName = function() {
 		return this.name;
 	}
 };
+
+SynthNode.prototype.generateCode = function() {
+	
+};

@@ -20,3 +20,7 @@ PlayNode.prototype.readName = function() {
 		return this.name;
 	}
 };
+
+PlayNode.prototype.generateCode = function() {
+	
+};

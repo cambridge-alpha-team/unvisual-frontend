@@ -13,3 +13,7 @@ TempoNode.prototype.readName = function() {
 		return this.name;
 	}
 };
+
+TempoNode.prototype.generateCode = function() {
+	
+};

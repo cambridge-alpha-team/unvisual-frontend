@@ -19,3 +19,7 @@ SampleNode.prototype.readName = function() {
 		return this.name;
 	}
 };
+
+SampleNode.prototype.generateCode = function() {
+	
+};

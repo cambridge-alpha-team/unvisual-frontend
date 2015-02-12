@@ -19,6 +19,10 @@ FXNode.prototype.readName = function() {
 	}
 };
 
+FXNode.prototype.generateCode = function() {
+	
+};
+
 FXNode.prototype.remove = function() {
 };
 FXNode.prototype.addPlay = function() {
