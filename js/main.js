@@ -7,6 +7,12 @@ var selectedCubelet;
 var selectedChoice;
 var loopNumber = 1; //to uniquely name loops
 
+function indent(text) {
+  return text.split("\n").map(function(line) {
+    return "    " + line;
+  }).join("\n");
+}
+
 
 //tests--------------
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
