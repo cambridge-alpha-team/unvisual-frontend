@@ -240,13 +240,13 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			break;
 		case 2:	// select cubelet
 			if(selectedCubelet < 6) {
-				selectedCubelet++;
+				selectedCubelet--;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
 		case 4: //choices
 			if((selectedChoice + 1) < activeNode.choices.length) {
-				selectedChoice++;
+				selectedChoice--;
 			}
 			say(activeNode.choices[selectedChoice]);
 			break;
@@ -270,13 +270,13 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			break;
 		case 2:	// select cubelet
 			if(selectedCubelet > 0) {
-				selectedCubelet--;
+				selectedCubelet++;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
 		case 4: //choices
 			if(0 < selectedChoice) {
-				selectedChoice--;
+				selectedChoice++;
 			}
 			say(activeNode.choices[selectedChoice]);
 			break;
