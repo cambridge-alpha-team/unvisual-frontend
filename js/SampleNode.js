@@ -1,7 +1,21 @@
 function SampleNode(parent, childNumber) {
-	var sampleNode = new ActionNode('sample', parent, childNumber);
-	new ValueNode('amp', sampleNode, 1, 1, 0, 1);
-	new ChoiceNode('sample name', sampleNode, ['bass_hit_c', 'loop_industrial', 'guit_harmonics']);
+	this.name = 'sample';
+	this.parent = parent || null;
+	this.children = [];
+	if(childNumber != null) {
+		parent.children.splice(childNumber, 0, this);
+	} else if(parent != null) {
+		parent.children.push(this);
+	}
 	
-	return sampleNode;
+	new ChoiceNode('sample name', this, ['bass_hit_c', 'loop_industrial', 'guit_harmonics']);
+	new ValueNode('amp', this, 1, 1, 0, 1);
 }
+
+SampleNode.prototype.readName = function() {
+	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {
+		return this.name + " " + this.children[0].choice;
+	} else {
+		return this.name;
+	}
+};

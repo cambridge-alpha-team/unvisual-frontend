@@ -1,7 +1,7 @@
 function RootNode() {
-	var rootNode = new Node("root");
-	
-	return rootNode;
+	this.name = "root";
+	this.parent = null;
+	this.children = [];
 }
 
 RootNode.prototype.remove = function() {

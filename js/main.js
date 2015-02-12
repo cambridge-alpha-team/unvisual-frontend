@@ -9,8 +9,7 @@ var loopNumber = 1; //to uniquely name loops
 
 
 //tests--------------
-var loopA = LoopNode("loop" + loopNumber++, root, 1);
-PlayNode(loopA, 0);
+var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 //-------------------
 
 //The speech doesn't seem to work---------
@@ -291,11 +290,11 @@ if (!String.prototype.startsWith) {
 	}
 
 //takes the root and generates code
-var tab = 0;
+//var tab = 0;
 
 
 function generateCode(node, tab) {
-	var sonicPi;
+	var sonicPi = '';
 	
 	function tabs(tab){
 		for (var n = 0; n <= tab; n++) {
@@ -303,24 +302,24 @@ function generateCode(node, tab) {
 		}
 	}
 		
-	for (child in node.children) {
+	for (var index = 0; index < node.children.length; index++) {
+		var child = node.children[index];
 		if ((child.name).startsWith("tempo")) {
-			sonicPi += ("with_tempo :" + child.children[0].defaultValue + " do \n");
-			tab++
+			sonicPi += ("with_tempo :" + child.children[0].choice + " do \n");
+			tab++;
 			tabs(tab);
 			for (var i = 1; i < child.children.length; i++ ) {
-				generateCode(child.children[i], tab);
+				sonicPi += generateCode(child.children[i], tab);
 			}
 			tab--;
 			tabs(tab);
 			sonicPi += "end \n";
-		}
-		if ((child.name).startsWith("loop")) {
+		} else if ((child.name).startsWith("loop")) {
 			tabs(tab);
 			sonicPi += ("live_loop :" + child.name + " do \n");
 			tab++;
 			for (var i = 0; i < child.children.length; i++ ) {
-				generateCode(child.children[i], tab);
+				sonicPi += generateCode(child.children[i], tab);
 			}
 			tab--;
 			tabs(tab);
@@ -344,7 +343,7 @@ function generateCode(node, tab) {
 			sonicPi += ("with_fx: " + child.children[0].choice + " do \n");
 			tab++;
 			for (var i = 1; i < child.children.length; i++ ){
-				generateCode(child.children[i], tab);
+				sonicPi += generateCode(child.children[i], tab);
 			}
 			tab--;
 			tabs(tab);
@@ -353,3 +352,5 @@ function generateCode(node, tab) {
 		return sonicPi;
 	}
 }
+
+document.getElementById("message").innerHTML = generateCode(root, 0);

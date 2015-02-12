@@ -1,8 +1,22 @@
 function PlayNode(parent, childNumber) {
-	var playNode = new ActionNode('play', parent, childNumber);
-	new ValueNode('note', playNode, 0, 60, 40, 100);
-	new ValueNode('amp', playNode, 1, 1, 0, 1);
-	new ValueNode('release', playNode, 2, 1, 0, 5);
+	this.name = 'play';
+	this.parent = parent || null;
+	this.children = [];
+	if(childNumber != null) {
+		parent.children.splice(childNumber, 0, this);
+	} else if(parent != null) {
+		parent.children.push(this);
+	}
+	new ValueNode('note', this, 0, 60, 40, 100);
+	new ValueNode('amp', this, 1, 1, 0, 1);
+	new ValueNode('release', this, 2, 1, 0, 5);
 	
-	return playNode;
 }
+
+PlayNode.prototype.readName = function() {
+	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {
+		return this.name + " " + this.children[0].choice;
+	} else {
+		return this.name;
+	}
+};

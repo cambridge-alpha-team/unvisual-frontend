@@ -1,11 +1,24 @@
 function LoopNode(name, parent, childNumber) {
-	var loopNode = new Node(name, parent, childNumber);
+	this.name = name;
+	this.parent = parent || null;
+	this.children = [];
+	if(childNumber != null) {
+		parent.children.splice(childNumber, 0, this);
+	} else if(parent != null) {
+		parent.children.push(this);
+	}
 	//these nodes are created to allow you to go into the loop
-	new PlayNode(loopNode,0);
-	new SleepNode(loopNode,1);
-	
-	return loopNode;
+	new PlayNode(this,0);
+	new SleepNode(this,1);
 }
+
+LoopNode.prototype.readName = function() {
+	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {
+		return this.name + " " + this.children[0].choice;
+	} else {
+		return this.name;
+	}
+};
 
 LoopNode.prototype.remove = function() {
 	

@@ -1,14 +1,23 @@
 function FXNode(parent) {
-	var fxNode = new ApplyNode("fx", parent, 0, []);
+	this.name = "fx";
+	this.parent = parent || null;
+	this.children = [];
+	parent.children.splice(0, 0, this);
 	while (parent.children.length > 1) {
-		fxNode.children.push(parent.children.pop());
-		fxNode.children[fxNode.children.length-1].parent = fxNode;
+		this.children.push(parent.children.pop());
+		this.children[this.children.length-1].parent = this;
 	}
-	fxNode.children.reverse();
-	new ChoiceNode('fx name', fxNode, ['echo', 'distortion', 'wobble']);
-	
-	return fxNode;
+	this.children.reverse();
+	new ChoiceNode('fx name', this, ['echo', 'distortion', 'wobble']);
 }
+
+FXNode.prototype.readName = function() {
+	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {
+		return this.name + " " + this.children[0].choice;
+	} else {
+		return this.name;
+	}
+};
 
 FXNode.prototype.remove = function() {
 };
