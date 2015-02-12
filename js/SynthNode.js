@@ -22,5 +22,12 @@ SynthNode.prototype.readName = function() {
 };
 
 SynthNode.prototype.generateCode = function() {
-	
+	var synthStg = "use_synth :";
+	for (var i = 0; i < this.children.length; i++ ){
+		synthStg += this.children[i].generateCode();
+	}
+	synthStg += "\n";
+	return synthStg;
 };
+
+
