@@ -1,6 +1,6 @@
 var root = new RootNode();
 var activeNode = new TempoNode();
-var mode = 0;	// 0 = default, 1 = add code, 2 = select cubelet, 3 = delete, 4 = change choice (making this an enum would be nice but it's not essential)
+var mode = null; // null | 'add' | 'bind-cubelet' | 'delete' | 'choose-value'
 var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
 var selectedCodeType;
 var selectedCubelet;
@@ -49,8 +49,8 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 
 //shortcut to add a node
 Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
-	mode = mode == 1 ? 0 : 1;
-	if (mode == 1) {
+	mode = mode == 'add' ? null : 'add';
+	if (mode == 'add') {
 		selectedCodeType = 0;
 		say("what do you want to add?");
 	} else {
@@ -65,8 +65,8 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
-	mode = mode == 3 ? 0 : 3;
-	if (mode == 3) {
+	mode = mode == 'delete' ? null : 'delete';
+	if (mode == 'delete') {
 		say("Are you sure you want to delete this bit of code? Press right to confirm or left to cancel.");
 	} else {
 		say("delete cancelled");
@@ -106,21 +106,21 @@ Mousetrap.bind(['command+r', 'ctrl+r'], function() {
 //shortcut to go out of list
 Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch(mode) {
-		case 1:	// add code
-			mode = 0;
+		case 'add':	// add code
+			mode = null;
 			say("adding code cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
-		case 2:	// select cubelet
-			mode = 0;
+		case 'bind-cubelet':	// select cubelet
+			mode = null;
 			say("cubelet selection cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
-		case 3:	// delete
-			mode = 0;
+		case 'delete':	// delete
+			mode = null;
 			say("delete cancelled. the currently selected bit of code is " + activeNode.readName());
 			break;
-		case 4: //choices
+		case 'choose-value': //choices
 			say(activeNode.name + " not changed from " + activeNode.choice);
-			mode = 0;
+			mode = null;
 			break;
 		default:
 			if(activeNode.parent != root) {
@@ -135,7 +135,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 //shortcut to go into a list
 Mousetrap.bind(['right', 'd', 'l'], function() {
 	switch(mode) {
-		case 1:	// add code
+		case 'add':	// add code
 			switch(selectedCodeType) {
 				case 0:	// loop
 					activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
@@ -166,18 +166,18 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					break;
 			}
 			say(activeNode.readName());
-			mode = 0;
+			mode = null;
 			break;
-		case 2:	// select cubelet
+		case 'bind-cubelet':	// select cubelet
 			activeNode.cubelet = selectedCubelet;
 			if (selectedCubelet > 0) {
 				say("Cubelet " + selectedCubelet + " selected.");
 			} else {
 				say("No cubelet selected.");
 			}
-			mode = 0;
+			mode = null;
 			break;
-		case 3:	// delete
+		case 'delete':	// delete
 			var index = -1;
 			// Determine the index of activeNode in the parent's array of children
 			var parent = activeNode.parent;
@@ -206,12 +206,12 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			} else {
 				say("ERROR: the currently selected bit of code is not recognised as a child by its parent.");
 			}
-			mode = 0;
+			mode = null;
 			break;
-		case 4: //choices
+		case 'choose-value': //choices
 			activeNode.choice = activeNode.choices[selectedChoice];
 			say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
-			mode = 0;
+			mode = null;
 			break;
 		default:
 			if(activeNode.children.length > 0) {
@@ -219,7 +219,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				say(activeNode.readName());
 			} else if(activeNode instanceof ValueNode || activeNode instanceof ChoiceNode) {				
 				selectedChoice = activeNode.choices.indexOf(activeNode.choice);
-				mode = 4;
+				mode = 'choose-value';
 				say(activeNode.choices[selectedChoice]);
 			}
 			break;
@@ -230,19 +230,19 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 //shortcut to go to the next element in a list
 Mousetrap.bind(['down', 's', 'j'], function() {
 	switch(mode) {
-		case 1:	// add code
+		case 'add':	// add code
 			if(selectedCodeType < (codeTypes.length - 1)) {
 				selectedCodeType++;
 			}
 			say(codeTypes[selectedCodeType]);
 			break;
-		case 2:	// select cubelet
+		case 'bind-cubelet':	// select cubelet
 			if(selectedCubelet > 0) {
 				selectedCubelet--;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
-		case 4: //choices
+		case 'choose-value': //choices
 			if(0 < selectedChoice) {
 				selectedChoice--;
 			}
@@ -260,19 +260,19 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 //shortcut to go to the previous element in a list
 Mousetrap.bind(['up', 'w', 'k'], function() {
 	switch(mode) {
-		case 1:	// add code
+		case 'add':	// add code
 			if(selectedCodeType > 0) {
 				selectedCodeType--;
 			}
 			say(codeTypes[selectedCodeType]);
 			break;
-		case 2:	// select cubelet
+		case 'bind-cubelet':	// select cubelet
 			if(selectedCubelet < 6) {
 				selectedCubelet++;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
-		case 4: //choices
+		case 'choose-value': //choices
 			if((selectedChoice + 1) < activeNode.choices.length) {
 				selectedChoice++;
 			}
