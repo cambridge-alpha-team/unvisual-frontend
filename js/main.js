@@ -13,13 +13,11 @@ var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 //-------------------
 
 //The speech doesn't seem to work---------
-var speechNode = (function() {
-	  var textNode = document.createTextNode('');
-	  $('#speech')[0].appendChild(textNode);
-	  return textNode;
-});
+var speechNode = document.createTextNode('');
+document.getElementById('speech').appendChild(speechNode);
 
 function say(message) {
+	speechNode.textContent = ''; // clear first to make sure it *changes*
 	speechNode.textContent = message;
 	console.log(message);
 }
