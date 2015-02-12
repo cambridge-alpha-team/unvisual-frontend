@@ -303,7 +303,7 @@ function generateCode(node, tab) {
 	for (var index = 0; index < node.children.length; index++) {
 		var child = node.children[index];
 		if ((child.name).startsWith("tempo")) {
-			sonicPi += ("with_tempo :" + child.children[0].choice + " do \n");
+			sonicPi += ("with_tempo :" + child.choice + " do \n");
 			tab++;
 			tabs(tab);
 			for (var i = 1; i < child.children.length; i++ ) {
