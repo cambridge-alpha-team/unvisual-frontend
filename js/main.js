@@ -14,11 +14,10 @@ function indent(text) {
 }
 
 
-//tests--------------
+//tests XXX
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
-//-------------------
 
-//The speech doesn't seem to work---------
+//speech
 var speechNode = document.createTextNode('');
 document.getElementById('speech').appendChild(speechNode);
 
@@ -27,7 +26,6 @@ function say(message) {
 	speechNode.textContent = message;
 	console.log(message);
 }
-//----------------------------------------
 
 //shortcut to make cubelet controlled
 Mousetrap.bind(['command+c', 'ctrl+c'], function() {
@@ -289,38 +287,39 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 	reGenerate();
 });
 
-Mousetrap.bind(['*'], function() {
-  request("POST", "/unvisual/rest/osc/stop", "", function() {
-    console.log("Woo, it worked");
-  }, function(err) {
-    console.log("This is a helpful error message");
-  });
-});
-
-
-Mousetrap.bind(['return', 'enter'], function() {
-  var code = root.generateCode();
-  sendCode(code);
-});
-
+// called when tree is updated
 function reGenerate() {
 	document.getElementById("message").innerHTML = '';
 	
 	var code = root.generateCode();
 	var node = document.createTextNode(code);
 	document.getElementById('message').appendChild(node);
-
 }
 
-function sendCode(code) {
-  request("POST", "/unvisual/rest/osc/run", code, function() {
-    console.log("Woo, it worked");
+reGenerate();
+
+
+// shortcut to stop all Sonic Pi loops
+Mousetrap.bind(['*'], function() {
+  request("POST", "/unvisual/rest/osc/stop", "", function() {
+    console.log("Sent stop OSC");
   }, function(err) {
     console.log("This is a helpful error message");
   });
-}
+});
 
+// shortcut to send code to Sonic Pi
+Mousetrap.bind(['return', 'enter'], function() {
+  var code = root.generateCode();
 
+  request("POST", "/unvisual/rest/osc/run", code, function() {
+    console.log("Sent run OSC");
+  }, function(err) {
+    console.log("This is a helpful error message");
+  });
+});
+
+// helper for making HTTP requests
 var request = function(method, url, body, resolve, reject) {
   var xhr = new XMLHttpRequest();
   xhr.open(method, url, true);
