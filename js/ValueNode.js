@@ -26,6 +26,7 @@ function ValueNode(name, parent, childNumber, defaultValue, min, max) {
 	}
 	this.choices.push(max);
 }
+inherits(ValueNode, Node);
 
 ValueNode.prototype.readName = function() {
 	return this.name + " " + this.choice;

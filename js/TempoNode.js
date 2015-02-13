@@ -3,3 +3,5 @@ function TempoNode() {
 	
 	return tempoNode;
 }
+inherits(TempoNode, Node);
+

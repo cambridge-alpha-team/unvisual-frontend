@@ -12,6 +12,7 @@ function PlayNode(parent, childNumber) {
 	new ValueNode('release', this, 2, 1, 0, 5);
 	
 }
+inherits(PlayNode, Node);
 
 PlayNode.prototype.readName = function() {
 	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {

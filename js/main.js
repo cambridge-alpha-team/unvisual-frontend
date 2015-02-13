@@ -7,12 +7,6 @@ var selectedCubelet;
 var selectedChoice;
 var loopNumber = 1; //to uniquely name loops
 
-function indent(text) {
-  return text.split("\n").map(function(line) {
-    return "    " + line;
-  }).join("\n");
-}
-
 
 //tests XXX
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
@@ -108,15 +102,15 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch(mode) {
 		case 'add':	// add code
 			mode = null;
-			say("adding code cancelled. the currently selected bit of code is " + activeNode.readName());
+			say("adding code cancelled. the currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'bind-cubelet':	// select cubelet
 			mode = null;
-			say("cubelet selection cancelled. the currently selected bit of code is " + activeNode.readName());
+			say("cubelet selection cancelled. the currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'delete':	// delete
 			mode = null;
-			say("delete cancelled. the currently selected bit of code is " + activeNode.readName());
+			say("delete cancelled. the currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'choose-value': //choices
 			say(activeNode.name + " not changed from " + activeNode.choice);
@@ -125,7 +119,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 		default:
 			if(activeNode.parent != root) {
 				activeNode = activeNode.parent;
-				say(activeNode.readName());
+				say("go out.   " + activeNode.readFull());
 			}
 			break;
 	}
@@ -165,7 +159,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					say("ERROR when attempting to add code.");
 					break;
 			}
-			say(activeNode.readName());
+			say(activeNode.readFull());
 			mode = null;
 			break;
 		case 'bind-cubelet':	// select cubelet
@@ -202,7 +196,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				// Remove activeNode from its parent's list of children
 				parent.children.splice(index, 1);
 				activeNode = parent;
-				say ("Code deleted. the currently selected bit of code is " + activeNode.readName());
+				say ("Code deleted. the currently selected bit of code is " + activeNode.readFull());
 			} else {
 				say("ERROR: the currently selected bit of code is not recognised as a child by its parent.");
 			}
@@ -215,8 +209,9 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			break;
 		default:
 			if(activeNode.children.length > 0) {
+				var oldActive = activeNode;
 				activeNode = activeNode.children[0];
-				say(activeNode.readName());
+                say("go into " + oldActive.readName() + ".   " + activeNode.readFull());
 			} else if(activeNode instanceof ValueNode || activeNode instanceof ChoiceNode) {				
 				selectedChoice = activeNode.choices.indexOf(activeNode.choice);
 				mode = 'choose-value';
@@ -251,7 +246,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
 			if((n + 1) < activeNode.parent.children.length) activeNode = activeNode.parent.children[n+1];
-			say(activeNode.readName());
+			say(activeNode.readFull());
 			break;
 	}
 	reGenerate();
@@ -281,7 +276,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
 			if(n != 0) activeNode = activeNode.parent.children[n-1];
-			say(activeNode.readName());
+			say(activeNode.readFull());
 			break;
 	}
 	reGenerate();

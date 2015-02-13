@@ -8,6 +8,7 @@ function ActionNode(name, parent, childNumber) {
 		parent.children.push(this);
 	}
 }
+inherits(ActionNode, Node);
 
 ActionNode.prototype.readName = function() {
 	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {

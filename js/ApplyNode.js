@@ -8,6 +8,7 @@ function ApplyNode(name, parent, childNumber, children) {
 		parent.children.push(this);
 	}
 }
+inherits(ApplyNode, Node);
 
 ApplyNode.prototype.readName = function() {
 	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {
