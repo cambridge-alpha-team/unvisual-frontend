@@ -21,12 +21,31 @@ LoopNode.prototype.readName = function() {
 };
 
 LoopNode.prototype.generateCode = function() {
+	
+	var depth = 0;
 	var sonicPi = "live_loop :" + this.name + " do\n";
+	depth++;
+	for (var n = 0; n < depth; n++){
+		sonicPi += "    ";
+	}
 	sonicPi += "with_bpm tempo do\n";
+	depth++;
 	for (var i = 0; i < this.children.length; i++) {
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += (this.children[i].generateCode() + "\n");
 	}
+	depth--;
+	for (var n = 0; n < depth; n++){
+		sonicPi += "    ";
+	}
 	sonicPi += "end\n";
+	depth--;
+	for (var n = 0; n < depth; n++){
+		sonicPi += "    ";
+	}
 	sonicPi += "end";
+	depth--;
 	return sonicPi;
 };

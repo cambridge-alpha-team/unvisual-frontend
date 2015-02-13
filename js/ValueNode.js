@@ -32,17 +32,50 @@ ValueNode.prototype.readName = function() {
 };
 
 ValueNode.prototype.generateCode = function() {
+
+	var depth = -1;
 	var sonicPi = "";
 	if(this.name == "sleep") {
 		sonicPi += "sleep " + this.choice;
 	} else if (this.name == "tempo") {
+		depth++;
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "define :tempo do\n";
+		depth++;
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "return " + this.choice + "\n";
+		depth--;
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "end\n";
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "live_loop :beat do\n";
+		depth++;
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "with_bpm tempo do\n";
+		depth++;
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "sleep 1\n";
+		depth--;
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "end\n";
+		depth--;
+		for (var n = 0; n < depth; n++){
+			sonicPi += "    ";
+		}
 		sonicPi += "end";
 	} else {
 		sonicPi += this.name + ": " + this.choice;
