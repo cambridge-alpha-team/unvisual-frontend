@@ -10,6 +10,7 @@ function FXNode(parent) {
 	this.children.reverse();
 	new ChoiceNode('fx name', this, ['echo', 'distortion', 'wobble']);
 }
+inherits(FXNode, Node);
 
 FXNode.prototype.readName = function() {
 	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {

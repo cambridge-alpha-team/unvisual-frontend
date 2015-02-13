@@ -11,6 +11,7 @@ function LoopNode(name, parent, childNumber) {
 	new PlayNode(this,0);
 	new SleepNode(this,1);
 }
+inherits(LoopNode, Node);
 
 LoopNode.prototype.readName = function() {
 	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {

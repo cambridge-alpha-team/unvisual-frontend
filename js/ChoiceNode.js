@@ -9,6 +9,7 @@ function ChoiceNode(name, parent, choices) {
 	this.choices = choices;
 	this.choice = choices[0];
 }
+inherits(ChoiceNode, Node);
 
 ChoiceNode.prototype.readName = function() {
 	return this.name + " " + this.choice;

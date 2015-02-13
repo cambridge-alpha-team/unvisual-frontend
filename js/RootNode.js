@@ -3,6 +3,7 @@ function RootNode() {
 	this.parent = null;
 	this.children = [];
 }
+inherits(RootNode, Node);
 
 RootNode.prototype.generateCode = function() {
 	var depth = -1;

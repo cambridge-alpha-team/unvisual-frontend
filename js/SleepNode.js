@@ -3,4 +3,5 @@ function SleepNode(parent, childNumber) {
 	
 	return sleepNode;
 }
+inherits(SleepNode, Node);
 
