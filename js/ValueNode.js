@@ -38,45 +38,19 @@ ValueNode.prototype.generateCode = function() {
 	if(this.name == "sleep") {
 		sonicPi += "sleep " + this.choice;
 	} else if (this.name == "tempo") {
-		depth++;
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "define :tempo do\n";
-		depth++;
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "return " + this.choice + "\n";
-		depth--;
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "end\n";
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "live_loop :beat do\n";
-		depth++;
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "with_bpm tempo do\n";
-		depth++;
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "sleep 1\n";
-		depth--;
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "end\n";
-		depth--;
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += "end";
+		sonicPi += (
+            "define :tempo do\n" +
+            indent("return " + this.choice + "\n") +
+            "end\n" +
+            "\n" +
+            "live_loop :beat do\n" +
+            indent("with_bpm tempo do\n" +
+                indent(
+                    "sleep 1\n"
+                ) +
+            "end\n") +
+            "end\n"
+        );
 	} else {
 		sonicPi += this.name + ": " + this.choice;
 	}
