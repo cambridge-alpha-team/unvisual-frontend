@@ -19,6 +19,6 @@ Node.prototype.readName = function() {
 
 Node.prototype.readFull = function() {
     var number = this.parent.children.indexOf(this) + 1;
-    return this.name + ";   item " + number + " of " + this.parent.children.length;
+    return this.readName() + ";   item " + number + " of " + this.parent.children.length;
 };
 
