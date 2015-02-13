@@ -24,28 +24,13 @@ LoopNode.prototype.generateCode = function() {
 	
 	var depth = 0;
 	var sonicPi = "live_loop :" + this.name + " do\n";
-	depth++;
-	for (var n = 0; n < depth; n++){
-		sonicPi += "    ";
-	}
-	sonicPi += "with_bpm tempo do\n";
-	depth++;
+	sonicPi += indent("with_bpm tempo do\n");
 	for (var i = 0; i < this.children.length; i++) {
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += (this.children[i].generateCode() + "\n");
+		sonicPi += indent(indent(this.children[i].generateCode() + "\n"));
 	}
-	depth--;
-	for (var n = 0; n < depth; n++){
-		sonicPi += "    ";
-	}
-	sonicPi += "end\n";
-	depth--;
-	for (var n = 0; n < depth; n++){
-		sonicPi += "    ";
-	}
+	sonicPi += indent("end\n");
 	sonicPi += "end";
 	depth--;
 	return sonicPi;
 };
+
