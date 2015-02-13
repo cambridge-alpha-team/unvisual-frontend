@@ -9,7 +9,6 @@ function SampleNode(parent, childNumber) {
 	}
 	
 	new ChoiceNode('sample name', this, ['bass_hit_c', 'loop_industrial', 'guit_harmonics']);
-	new ValueNode('amp', this, 1, 1, 0, 1);
 }
 inherits(SampleNode, Node);
 
