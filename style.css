@@ -1,6 +1,7 @@
 body {
   margin: 0 auto;
   padding: 1em;
+  padding-bottom: 7em;
   max-width: 48em;
   font-family: "Noto Sans", "Helvetica Neue", sans-serif;
 
@@ -23,6 +24,7 @@ pre {
   font-weight: 600;
   background: #e8e8e8;
   text-align: right;
+  white-space: pre-wrap;
 }
 
 #speech:before, #speech:after {
