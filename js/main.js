@@ -124,6 +124,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 //shortcut to go into a list
@@ -220,6 +221,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 //shortcut to go to the next element in a list
@@ -250,6 +252,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 //shortcut to go to the previous element in a list
@@ -280,6 +283,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 // called when tree is updated
@@ -301,6 +305,7 @@ Mousetrap.bind(['*'], function() {
   }, function(err) {
     console.log("This is a helpful error message");
   });
+  return false;
 });
 
 // shortcut to send code to Sonic Pi
@@ -312,6 +317,7 @@ Mousetrap.bind(['return', 'enter'], function() {
   }, function(err) {
     console.log("This is a helpful error message");
   });
+  return false;
 });
 
 // helper for making HTTP requests
