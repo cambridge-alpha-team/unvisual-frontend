@@ -43,14 +43,19 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 
 //shortcut to add a node
 Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
-	mode = mode == 'add' ? null : 'add';
-	if (mode == 'add') {
-		selectedCodeType = 0;
-		say("what do you want to add?");
+	if(['root','fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
+		say('you cannot add code here. ' + activeNode.readName() + ' is currently selected');
+		mode = null;
 	} else {
-		say("adding code cancelled");
+		mode = mode == 'add' ? null : 'add';
+		if (mode == 'add') {
+			selectedCodeType = 0;
+			say("what do you want to add?");
+		} else {
+			say("adding code cancelled");
+		}
+		reGenerate();
 	}
-	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
@@ -60,7 +65,8 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 //shortcut to delete a node
 Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
 	if(activeNode.name == "tempo" || activeNode.parent.children.length == 1) {
-		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
+		say('you cannot delete this code. ' + activeNode.readName() + ' is currently selected');
+		mode = null;
 	} else {
 		mode = mode == 'delete' ? null : 'delete';
 		if (mode == 'delete') {
