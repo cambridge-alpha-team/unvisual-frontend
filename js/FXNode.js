@@ -21,9 +21,9 @@ FXNode.prototype.readName = function() {
 };
 
 FXNode.prototype.generateCode = function() {
-	var sonicPi = "with_fx :" + this.name + " do\n";
-	for (var i = 0; i < this.children.length; i++) {
-		sonicPi += (this.children[i].generateCode() + "\n");
+	var sonicPi = "with_fx :" + this.children[0].generateCode() + " do\n";
+	for (var i = 1; i < this.children.length; i++) {
+		sonicPi += indent(this.children[i].generateCode() + "\n");
 	}
 	sonicPi += "end";
 	return sonicPi;
