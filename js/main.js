@@ -50,7 +50,7 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 		mode = mode == 'add' ? null : 'add';
 		if (mode == 'add') {
 			selectedCodeType = 0;
-			say("what do you want to add?");
+			say("what do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else {
 			say("adding code cancelled");
 		}
@@ -236,7 +236,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			if(selectedCodeType < (codeTypes.length - 1)) {
 				selectedCodeType++;
 			}
-			say(codeTypes[selectedCodeType]);
+			say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			break;
 		case 'bind-cubelet':	// select cubelet
 			if(selectedCubelet > 0) {
@@ -271,7 +271,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			if(selectedCodeType > 0) {
 				selectedCodeType--;
 			}
-			say(codeTypes[selectedCodeType]);
+			say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			break;
 		case 'bind-cubelet':	// select cubelet
 			if(selectedCubelet < 6) {
