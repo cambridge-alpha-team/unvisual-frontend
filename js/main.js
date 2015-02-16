@@ -349,28 +349,28 @@ function handleKey(e) {
     case 50:
     case 98:
       Mousetrap.trigger('down');
-      break;
+      return false;
     case 52:
     case 55:
     case 100:
     case 121:
     case 122:
       Mousetrap.trigger('left');
-      break;
+      return false;
     case 54:
     case 102:
       Mousetrap.trigger('right');
-      break;
+      return false;
     case 56:
     case 104:
       Mousetrap.trigger('up');
-      break;
+      return false;
     case 45:
       Mousetrap.trigger('minus');
-      break;
+      return false;
     case 43:
       Mousetrap.trigger('plus');
-      break;
+      return false;
     default:
   }
 }
