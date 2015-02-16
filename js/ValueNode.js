@@ -1,4 +1,4 @@
-function ValueNode(name, parent, childNumber, defaultValue, min, max) {
+function ValueNode(name, parent, childNumber, defaultValue, min, max, stepSize) {
 	this.name = name;
 	this.parent = parent || null;
 	this.children = [];
@@ -13,16 +13,7 @@ function ValueNode(name, parent, childNumber, defaultValue, min, max) {
 	this.Max = max;
 	
 	this.choices = [];
-	var increments = 0;
-	if (this.name == "sleep") {
-		increments = 0.125;
-	} else if (this.name == "tempo") {
-		increments = 5;
-	} else if (this.name == "note") {
-		increments = 1;
-	} else if (this.name == "amp" || this.name == "release") {
-		increments = 0.5; //TODO: increment 0.1 but fix rounding issues
-	}
+	var increments = stepSize || 1;
 	for(var i = min; i < max; i = i + increments) {
 		this.choices.push(i);
 	}
