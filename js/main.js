@@ -64,7 +64,7 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
-	if(activeNode.name == "tempo" || activeNode.parent.children.length == 1) {
+	if(activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode) {
 		say('you cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -187,13 +187,10 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			if(index >= 0) {
 				if(activeNode.name == "fx") {
 					// Parent activeNode's children to activeNode's parent
-					activeNode.children.reverse();
-					while(activeNode.children.length > 0) {
-						var childNode = activeNode.children.pop();
-						if(!(childNode instanceof ValueNode || childNode instanceof ChoiceNode)) {
-							parent.children.splice(index + 1, 0, childNode);
-							childNode.parent = parent;
-						}
+					for(var i = 1; i < activeNode.children.length; i++) {
+						var childNode = activeNode.children[i];
+						activeNode.parent.children.splice(index + i, 0, childNode);
+						childNode.parent = activeNode.parent;
 					}
 				}
 				// Remove activeNode from its parent's list of children
