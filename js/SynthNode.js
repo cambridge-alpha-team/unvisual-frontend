@@ -10,6 +10,8 @@ function SynthNode(parent, childNumber) {
 	new ChoiceNode('synth name', this, ['dsaw', 'fm', 'prophet']);
 }
 
+inherits(SynthNode, Node);
+
 SynthNode.prototype.readName = function() {
 	if(this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {
 		return this.name + " " + this.children[0].choice;
@@ -23,7 +25,6 @@ SynthNode.prototype.generateCode = function() {
 	for (var i = 0; i < this.children.length; i++ ){
 		synthStg += this.children[i].generateCode();
 	}
-	synthStg += "\n";
 	return synthStg;
 };
 
