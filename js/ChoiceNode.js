@@ -18,3 +18,15 @@ ChoiceNode.prototype.readName = function() {
 ChoiceNode.prototype.generateCode = function() {
 	return this.choice;
 };
+
+ChoiceNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	if(this == activeNode) {
+		sonicPi += '<pre style="font-size: 1em; border: black 2px solid; display: inline">';
+	}
+	sonicPi += this.choice;
+	if(this == activeNode) {
+		sonicPi += '</pre>';
+	}
+	return sonicPi;
+};

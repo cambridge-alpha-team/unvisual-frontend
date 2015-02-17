@@ -32,3 +32,21 @@ PlayNode.prototype.generateCode = function() {
 	return sonicPi;
 };
 
+PlayNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	if(this == activeNode) {
+		sonicPi += '<pre style="border: black 2px solid; font-size: 1em; display: inline">';
+	}
+	sonicPi += "play ";
+	for (var i = 0; i < this.children.length; i++) {
+		if(i != 0) sonicPi += ", ";
+		
+		sonicPi += this.children[i].generateHTML();
+	}
+	if(this == activeNode) {
+		sonicPi += '</pre>';
+	}
+	return sonicPi;
+};
+
+

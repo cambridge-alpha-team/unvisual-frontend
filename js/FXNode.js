@@ -29,13 +29,18 @@ FXNode.prototype.generateCode = function() {
 	return sonicPi;
 };
 
-FXNode.prototype.remove = function() {
-};
-FXNode.prototype.addPlay = function() {
-};
-FXNode.prototype.addSleep = function() {
-};
-FXNode.prototype.addSample = function() {
-};
-FXNode.prototype.addSynth = function() {
+FXNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	if(this == activeNode) {
+		sonicPi += '<pre style="font-size: 1em; margin: 0px; border: black 2px solid">';
+	}
+	sonicPi += "with_fx :" + this.children[0].generateHTML() + " do\n";
+	for (var i = 1; i < this.children.length; i++) {
+		sonicPi += indent(this.children[i].generateHTML() + "\n");
+	}
+	sonicPi += "end";
+	if(this == activeNode) {
+		sonicPi += '</pre>';
+	}
+	return sonicPi;
 };

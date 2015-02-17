@@ -22,8 +22,6 @@ LoopNode.prototype.readName = function() {
 };
 
 LoopNode.prototype.generateCode = function() {
-	
-	var depth = 0;
 	var sonicPi = "live_loop :" + this.name + " do\n";
 	sonicPi += indent("with_bpm tempo do\n");
 	for (var i = 0; i < this.children.length; i++) {
@@ -31,7 +29,24 @@ LoopNode.prototype.generateCode = function() {
 	}
 	sonicPi += indent("end\n");
 	sonicPi += "end";
-	depth--;
+	return sonicPi;
+};
+
+LoopNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	if(this == activeNode) {
+		sonicPi += '<pre style="margin: 0px; font-size: 1em; border: black 2px solid">';
+	}
+	sonicPi += "live_loop :" + this.name + " do\n";
+	sonicPi += indent("with_bpm tempo do\n");
+	for (var i = 0; i < this.children.length; i++) {
+		sonicPi += indent(indent(this.children[i].generateHTML() + "\n"));
+	}
+	sonicPi += indent("end\n");
+	sonicPi += "end";
+	if(this == activeNode) {
+		sonicPi += '</pre>';
+	}
 	return sonicPi;
 };
 

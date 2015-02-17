@@ -6,15 +6,23 @@ function RootNode() {
 inherits(RootNode, Node);
 
 RootNode.prototype.generateCode = function() {
-	var depth = -1;
 	var sonicPi = "";
-	depth++;
 	for (var i = 0; i < this.children.length; i++) {
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += (this.children[i].generateCode() + "\n");
+		sonicPi += (this.children[i].generateCode() + "\n\n");
 	}
-	depth--;
+	return sonicPi;
+};
+
+RootNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	if(this == activeNode) {
+		sonicPi += '<pre style="border: black 2px solid; font-size: 1em; display: inline">';
+	}
+	for (var i = 0; i < this.children.length; i++) {
+		sonicPi += (this.children[i].generateHTML() + "\n\n");
+	}
+	if(this == activeNode) {
+		sonicPi += '</pre>';
+	}
 	return sonicPi;
 };
