@@ -43,14 +43,19 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 
 //shortcut to add a node
 Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
-	mode = mode == 'add' ? null : 'add';
-	if (mode == 'add') {
-		selectedCodeType = 0;
-		say("what do you want to add?");
+	if(['root','fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
+		say('you cannot add code here. ' + activeNode.readName() + ' is currently selected');
+		mode = null;
 	} else {
-		say("adding code cancelled");
+		mode = mode == 'add' ? null : 'add';
+		if (mode == 'add') {
+			selectedCodeType = 0;
+			say("what do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
+		} else {
+			say("adding code cancelled");
+		}
+		reGenerate();
 	}
-	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
@@ -59,8 +64,9 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
-	if(activeNode.name == "tempo" || activeNode.parent.children.length == 1) {
-		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
+	if(activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode) {
+		say('you cannot delete this code. ' + activeNode.readName() + ' is currently selected');
+		mode = null;
 	} else {
 		mode = mode == 'delete' ? null : 'delete';
 		if (mode == 'delete') {
@@ -181,13 +187,10 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			if(index >= 0) {
 				if(activeNode.name == "fx") {
 					// Parent activeNode's children to activeNode's parent
-					activeNode.children.reverse();
-					while(activeNode.children.length > 0) {
-						var childNode = activeNode.children.pop();
-						if(!(childNode instanceof ValueNode || childNode instanceof ChoiceNode)) {
-							parent.children.splice(index + 1, 0, childNode);
-							childNode.parent = parent;
-						}
+					for(var i = 1; i < activeNode.children.length; i++) {
+						var childNode = activeNode.children[i];
+						activeNode.parent.children.splice(index + i, 0, childNode);
+						childNode.parent = activeNode.parent;
 					}
 				}
 				// Remove activeNode from its parent's list of children
@@ -230,7 +233,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			if(selectedCodeType < (codeTypes.length - 1)) {
 				selectedCodeType++;
 			}
-			say(codeTypes[selectedCodeType]);
+			say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			break;
 		case 'bind-cubelet':	// select cubelet
 			if(selectedCubelet > 0) {
@@ -265,7 +268,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			if(selectedCodeType > 0) {
 				selectedCodeType--;
 			}
-			say(codeTypes[selectedCodeType]);
+			say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			break;
 		case 'bind-cubelet':	// select cubelet
 			if(selectedCubelet < 6) {
