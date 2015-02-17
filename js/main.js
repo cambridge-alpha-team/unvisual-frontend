@@ -59,13 +59,17 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
-	mode = mode == 'delete' ? null : 'delete';
-	if (mode == 'delete') {
-		say("Are you sure you want to delete this bit of code? Press right to confirm or left to cancel.");
+	if(activeNode.name == "tempo" || activeNode.parent.children.length == 1) {
+		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 	} else {
-		say("delete cancelled");
+		mode = mode == 'delete' ? null : 'delete';
+		if (mode == 'delete') {
+			say("Are you sure you want to delete this bit of code? Press right to confirm or left to cancel.");
+		} else {
+			say("delete cancelled");
+		}
+		reGenerate();
 	}
-	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
@@ -172,17 +176,10 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			mode = null;
 			break;
 		case 'delete':	// delete
-			var index = -1;
 			// Determine the index of activeNode in the parent's array of children
-			var parent = activeNode.parent;
-			for (var i = 0; i < parent.children.length; i++) {
-				if (parent.children[i] == activeNode) {
-					index = i;
-					break;
-				}
-			}
-			if (index >= 0) {
-				if (activeNode.name == "fx") {
+			var index = activeNode.parent.children.indexOf(activeNode);
+			if(index >= 0) {
+				if(activeNode.name == "fx") {
 					// Parent activeNode's children to activeNode's parent
 					activeNode.children.reverse();
 					while(activeNode.children.length > 0) {
@@ -194,9 +191,13 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					}
 				}
 				// Remove activeNode from its parent's list of children
-				parent.children.splice(index, 1);
-				activeNode = parent;
-				say ("Code deleted. the currently selected bit of code is " + activeNode.readFull());
+				activeNode.parent.children.splice(index, 1);
+				if(index > 0) {
+					activeNode = activeNode.parent.children[index - 1];
+				} else {
+					activeNode = activeNode.parent.children[index];
+				}
+				say("Code deleted. the currently selected bit of code is " + activeNode.readFull());
 			} else {
 				say("ERROR: the currently selected bit of code is not recognised as a child by its parent.");
 			}
@@ -243,6 +244,9 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			}
 			say(activeNode.choices[selectedChoice]);
 			break;
+		case 'delete': //delete
+			//do nothing
+			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
 			if((n + 1) < activeNode.parent.children.length) activeNode = activeNode.parent.children[n+1];
@@ -272,6 +276,9 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 				selectedChoice++;
 			}
 			say(activeNode.choices[selectedChoice]);
+			break;
+		case 'delete': //delete
+			//do nothing
 			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
