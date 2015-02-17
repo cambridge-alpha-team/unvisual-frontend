@@ -240,8 +240,10 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 		case 'choose-value': //choices
 			if(0 < selectedChoice) {
 				selectedChoice--;
+				say(activeNode.choices[selectedChoice]);
+			} else {
+				say(activeNode.choices[selectedChoice] + " This is the minimum possible value.");
 			}
-			say(activeNode.choices[selectedChoice]);
 			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
@@ -270,8 +272,10 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 		case 'choose-value': //choices
 			if((selectedChoice + 1) < activeNode.choices.length) {
 				selectedChoice++;
+				say(activeNode.choices[selectedChoice]);
+			} else {
+				say(activeNode.choices[selectedChoice] + " This is the maximum possible value.");
 			}
-			say(activeNode.choices[selectedChoice]);
 			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
