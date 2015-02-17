@@ -134,6 +134,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 //shortcut to go into a list
@@ -224,6 +225,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 //shortcut to go to the next element in a list
@@ -259,6 +261,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 //shortcut to go to the previous element in a list
@@ -294,6 +297,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			break;
 	}
 	reGenerate();
+	return false;
 });
 
 // called when tree is updated
@@ -315,6 +319,7 @@ Mousetrap.bind(['*'], function() {
   }, function(err) {
     console.log("This is a helpful error message");
   });
+  return false;
 });
 
 // shortcut to send code to Sonic Pi
@@ -326,6 +331,7 @@ Mousetrap.bind(['return', 'enter'], function() {
   }, function(err) {
     console.log("This is a helpful error message");
   });
+  return false;
 });
 
 // helper for making HTTP requests
@@ -357,28 +363,28 @@ function handleKey(e) {
     case 50:
     case 98:
       Mousetrap.trigger('down');
-      break;
+      return false;
     case 52:
     case 55:
     case 100:
     case 121:
     case 122:
       Mousetrap.trigger('left');
-      break;
+      return false;
     case 54:
     case 102:
       Mousetrap.trigger('right');
-      break;
+      return false;
     case 56:
     case 104:
       Mousetrap.trigger('up');
-      break;
+      return false;
     case 45:
       Mousetrap.trigger('minus');
-      break;
+      return false;
     case 43:
       Mousetrap.trigger('plus');
-      break;
+      return false;
     default:
   }
 }
