@@ -15,10 +15,18 @@ var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 var speechNode = document.createTextNode('');
 document.getElementById('speech').appendChild(speechNode);
 
+var lastSay = 0;
+const defaultSayDelay = 500;
+const changeValueSayDelay = 20;
 function say(message) {
-	speechNode.textContent = ''; // clear first to make sure it *changes*
-	speechNode.textContent = message;
-	console.log(message);
+	var date = new Date();
+	var t = date.getTime();
+	if ((mode == 'choose-value' && lastSay + changeValueSayDelay < t) || lastSay + defaultSayDelay < t) {
+		speechNode.textContent = ''; // clear first to make sure it *changes*
+		speechNode.textContent = message;
+		lastSay = t;
+		console.log(message);
+	}
 }
 
 //shortcut to make cubelet controlled
