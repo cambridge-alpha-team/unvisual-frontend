@@ -15,14 +15,11 @@ RootNode.prototype.generateCode = function() {
 
 RootNode.prototype.generateHTML = function() {
 	var sonicPi = '';
-	if(this == activeNode) {
-		sonicPi += '<pre style="border: black 2px solid; font-size: 1em; display: inline">';
-	}
 	for (var i = 0; i < this.children.length; i++) {
-		sonicPi += (this.children[i].generateHTML() + "\n\n");
-	}
-	if(this == activeNode) {
-		sonicPi += '</pre>';
+		sonicPi += (this.children[i].generateHTML() + "\n");
+		if(!isBoxed(this.children[i])) {
+			sonicPi += "\n";
+		}
 	}
 	return sonicPi;
 };

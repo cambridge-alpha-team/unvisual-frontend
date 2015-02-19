@@ -59,10 +59,10 @@ ValueNode.prototype.generateCode = function() {
 ValueNode.prototype.generateHTML = function() {
 	var sonicPi = '';
 	if(this == activeNode) {
-		if (this.name == "tempo") {
-			sonicPi += '<pre style="margin: 0px; font-size: 1em; border: black 2px solid">';
-		} else {
+		if (this.name != "tempo") {
 			sonicPi += '<pre style="display: inline; font-size: 1em; border: black 2px solid">';
+		} else {
+			sonicPi += '<pre style="margin: 0px; font-size: 1em; border: black 2px solid"><span>';
 		}
 	}
 	
@@ -85,7 +85,6 @@ ValueNode.prototype.generateHTML = function() {
 	} else {
 		sonicPi += this.name + ": " + this.choice;
 	}
-	
 	if(this == activeNode) {
 		sonicPi += '</pre>';
 	}
