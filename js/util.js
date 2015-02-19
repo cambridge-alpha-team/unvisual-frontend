@@ -1,8 +1,16 @@
 
 function indent(text) {
-  return text.split("\n").map(function(line) {
+  var t =text.split("\n").map(function(line) {
     return line ? ("  " + line) : "";
   }).join("\n");
+  
+  var tsplit = t.split("<span>");
+  
+  for(var i = 1; i < tsplit.length; i++) {
+	  tsplit[i] = "  " + tsplit[i];
+  }
+  
+  return tsplit.join("<span>");
 }
 
 function inherits(cls, sup) {
@@ -13,3 +21,6 @@ function inherits(cls, sup) {
   };
 };
 
+function isBoxed(node) {
+	 return (node == activeNode && ((node instanceof LoopNode || node instanceof FXNode) || node.name == "tempo"));
+};

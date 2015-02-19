@@ -29,3 +29,25 @@ SampleNode.prototype.generateCode = function() {
 	}
 	return sonicPi;
 };
+
+SampleNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	if(this == activeNode) {
+		sonicPi += '<pre style="display: inline; font-size: 1em; border: black 2px solid">';
+	}
+	
+	sonicPi += "sample :" + this.children[0].generateHTML();
+	for (var i = 1; i < this.children.length; i++) {
+		if(i == 1) {
+			sonicPi += " ";
+		} else {
+			sonicPi += ", ";
+		}
+		sonicPi += this.children[i].generateHTML();
+	}
+	
+	if(this == activeNode) {
+		sonicPi += '</pre>';
+	}
+	return sonicPi;
+};

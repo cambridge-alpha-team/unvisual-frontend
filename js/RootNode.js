@@ -6,15 +6,20 @@ function RootNode() {
 inherits(RootNode, Node);
 
 RootNode.prototype.generateCode = function() {
-	var depth = -1;
 	var sonicPi = "";
-	depth++;
 	for (var i = 0; i < this.children.length; i++) {
-		for (var n = 0; n < depth; n++){
-			sonicPi += "    ";
-		}
-		sonicPi += (this.children[i].generateCode() + "\n");
+		sonicPi += (this.children[i].generateCode() + "\n\n");
 	}
-	depth--;
+	return sonicPi;
+};
+
+RootNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	for (var i = 0; i < this.children.length; i++) {
+		sonicPi += (this.children[i].generateHTML() + "\n");
+		if(!isBoxed(this.children[i])) {
+			sonicPi += "\n";
+		}
+	}
 	return sonicPi;
 };

@@ -313,11 +313,14 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 
 // called when tree is updated
 function reGenerate() {
+	document.getElementById("message").innerHTML = root.generateHTML();
+	/*
 	document.getElementById("message").innerHTML = '';
 	
 	var code = root.generateCode();
 	var node = document.createTextNode(code);
 	document.getElementById('message').appendChild(node);
+	*/
 }
 
 reGenerate();

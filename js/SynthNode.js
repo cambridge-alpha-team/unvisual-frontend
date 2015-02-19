@@ -21,11 +21,26 @@ SynthNode.prototype.readName = function() {
 };
 
 SynthNode.prototype.generateCode = function() {
-	var synthStg = "use_synth :";
+	var sonicPi = "use_synth :";
 	for (var i = 0; i < this.children.length; i++ ){
-		synthStg += this.children[i].generateCode();
+		sonicPi += this.children[i].generateCode();
 	}
-	return synthStg;
+	return sonicPi;
 };
 
-
+SynthNode.prototype.generateHTML = function() {
+	var sonicPi = '';
+	if(this == activeNode) {
+		sonicPi += '<pre style="display: inline; font-size: 1em; border: black 2px solid">';
+	}
+	
+	sonicPi += "use_synth :";
+	for (var i = 0; i < this.children.length; i++ ){
+		sonicPi += this.children[i].generateHTML();
+	}
+	
+	if(this == activeNode) {
+		sonicPi += '</pre>';
+	}
+	return sonicPi;
+};
