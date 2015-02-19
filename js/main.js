@@ -44,15 +44,15 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 //shortcut to add a node
 Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 	if(['root','fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
-		say('you cannot add code here. ' + activeNode.readName() + ' is currently selected');
+		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
 		mode = mode == 'add' ? null : 'add';
 		if (mode == 'add') {
 			selectedCodeType = 0;
-			say("what do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
+			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else {
-			say("adding code cancelled");
+			say("Adding code cancelled");
 		}
 		reGenerate();
 	}
@@ -65,14 +65,14 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 //shortcut to delete a node
 Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
 	if(activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode) {
-		say('you cannot delete this code. ' + activeNode.readName() + ' is currently selected');
+		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
 		mode = mode == 'delete' ? null : 'delete';
 		if (mode == 'delete') {
 			say("Are you sure you want to delete this bit of code? Press right to confirm or left to cancel.");
 		} else {
-			say("delete cancelled");
+			say("Delete cancelled");
 		}
 		reGenerate();
 	}
@@ -112,15 +112,15 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch(mode) {
 		case 'add':	// add code
 			mode = null;
-			say("adding code cancelled. the currently selected bit of code is " + activeNode.readFull());
+			say("Adding code cancelled. The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'bind-cubelet':	// select cubelet
 			mode = null;
-			say("cubelet selection cancelled. the currently selected bit of code is " + activeNode.readFull());
+			say("Cubelet selection cancelled. The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'delete':	// delete
 			mode = null;
-			say("delete cancelled. the currently selected bit of code is " + activeNode.readFull());
+			say("Delete cancelled. The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'choose-value': //choices
 			say(activeNode.name + " not changed from " + activeNode.choice);
@@ -129,7 +129,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 		default:
 			if(activeNode.parent != root) {
 				activeNode = activeNode.parent;
-				say("go out.   " + activeNode.readFull());
+				say("Go out.   " + activeNode.readFull());
 			}
 			break;
 	}
@@ -144,30 +144,30 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			switch(selectedCodeType) {
 				case 0:	// loop
 					activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("new loop created");
+					say("New loop created");
 					break;
 				case 1:	// play
 					activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("new note created");
+					say("New note created");
 					break;
 				case 2:	// sleep
 					activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("new rest created");
+					say("New rest created");
 					break;
 				case 3:	// fx
 					activeNode = new FXNode(activeNode.parent);
-					say("new FX created");
+					say("New FX created");
 					break;
 				case 4:	// synth
 					activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("new synth created");
+					say("New synth created");
 					break;
 				case 5:	// sample
 					activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("new sample created");
+					say("New sample created");
 				break;
 				default:	// something's wrong
-					say("ERROR when attempting to add code.");
+					say("ERROR When attempting to add code.");
 					break;
 			}
 			say(activeNode.readFull());
@@ -201,9 +201,9 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				} else {
 					activeNode = activeNode.parent.children[index];
 				}
-				say("Code deleted. the currently selected bit of code is " + activeNode.readFull());
+				say("Code deleted. The currently selected bit of code is " + activeNode.readFull());
 			} else {
-				say("ERROR: the currently selected bit of code is not recognised as a child by its parent.");
+				say("ERROR: The currently selected bit of code is not recognised as a child by its parent.");
 			}
 			mode = null;
 			break;
@@ -216,11 +216,21 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			if(activeNode.children.length > 0) {
 				var oldActive = activeNode;
 				activeNode = activeNode.children[0];
-                say("go into " + oldActive.readName() + ".   " + activeNode.readFull());
-			} else if(activeNode instanceof ValueNode || activeNode instanceof ChoiceNode) {				
+                say("Go into " + oldActive.readName() + ".   " + activeNode.readFull());
+			} else if(activeNode instanceof ValueNode || activeNode instanceof ChoiceNode) {
 				selectedChoice = activeNode.choices.indexOf(activeNode.choice);
 				mode = 'choose-value';
-				say(activeNode.choices[selectedChoice]);
+				if(activeNode.name == "sleep") {
+					say("How many beats do you want to sleep for? Choose a value between 0.125 and 4: " + activeNode.choices[selectedChoice]);
+				} else if(activeNode.name == "note") {
+					say("Choose a value between 40 and 100 for your note: " + activeNode.choices[selectedChoice]);
+				} else if(activeNode.name == "amp") {
+					say("How loud do you want this to be? Choose a value between 0 and 1: " + activeNode.choices[selectedChoice]);
+				} else if(activeNode.name == "release") {
+					say("How slowly do you want to go from full amplitude to silence? Choose a value between 0 and 5: " + activeNode.choices[selectedChoice]);
+				} else if(activeNode.name == "tempo") {
+					say("Choose a tempo for your piece between 60 and 180: " + activeNode.choices[selectedChoice]);
+				}
 			}
 			break;
 	}
@@ -248,7 +258,8 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 				selectedChoice--;
 				say(activeNode.choices[selectedChoice]);
 			} else {
-				say(activeNode.choices[selectedChoice] + " This is the minimum possible value.");
+				say("You have reached the bottom of the list of choices.");
+				selectedChoice = -1;
 			}
 			break;
 		case 'delete': //delete
@@ -284,7 +295,8 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 				selectedChoice++;
 				say(activeNode.choices[selectedChoice]);
 			} else {
-				say(activeNode.choices[selectedChoice] + " This is the maximum possible value.");
+				say("You have reached the top of the list of choices.");
+				selectedChoice = activeNode.choices.length;
 			}
 			break;
 		case 'delete': //delete
