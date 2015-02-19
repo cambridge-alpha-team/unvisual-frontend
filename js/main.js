@@ -314,7 +314,7 @@ reGenerate();
 
 // shortcut to stop all Sonic Pi loops
 Mousetrap.bind(['*'], function() {
-  request("POST", "rest/osc/stop", "", function() {
+  request("POST", "osc/stop", "", function() {
     console.log("Sent stop OSC");
   }, function(err) {
     console.log("This is a helpful error message");
@@ -326,7 +326,7 @@ Mousetrap.bind(['*'], function() {
 Mousetrap.bind(['return', 'enter'], function() {
   var code = root.generateCode();
 
-  request("POST", "rest/osc/run", code, function() {
+  request("POST", "osc/run", code, function() {
     console.log("Sent run OSC");
   }, function(err) {
     console.log("This is a helpful error message");
