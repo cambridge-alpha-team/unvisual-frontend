@@ -15,18 +15,33 @@ var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 var speechNode = document.createTextNode('');
 document.getElementById('speech').appendChild(speechNode);
 
+const defaultSayDelay = 1000;
+const changeValueSayDelay = 200;
 var lastSay = 0;
-const defaultSayDelay = 500;
-const changeValueSayDelay = 20;
-function say(message) {
-	var date = new Date();
-	var t = date.getTime();
-	if ((mode == 'choose-value' && lastSay + changeValueSayDelay < t) || lastSay + defaultSayDelay < t) {
+var sayCount = 0;
+function sayNow(message, delay, sc) {
+	//console.log("In sayNow");
+	if (sayCount == sc) {
 		speechNode.textContent = ''; // clear first to make sure it *changes*
 		speechNode.textContent = message;
+		var date = new Date();
+		var t = date.getTime();
 		lastSay = t;
 		console.log(message);
+		console.log(message + " - displayed.");
+	} else {
+		console.log(message + " - skipped.");
 	}
+	sayWaiting--;
+}
+function say(message) {
+	sayCount++;
+	var sc = sayCount;
+	var date = new Date();
+	var t = date.getTime();
+	var minDelay = mode == 'choose-value' ? changeValueSayDelay : defaultSayDelay;
+	var delay = t > lastSay + minDelay ? 0 : lastSay + minDelay - t;
+	window.setTimeout(function() {sayNow(message, delay, sc);}, delay);
 }
 
 //shortcut to make cubelet controlled
