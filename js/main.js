@@ -123,7 +123,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			say("Delete cancelled. The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'choose-value': //choices
-			say(activeNode.name + " not changed from " + activeNode.choice);
+			say("Go out.   " + activeNode.readFull());
 			mode = null;
 			break;
 		default:
@@ -208,9 +208,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			mode = null;
 			break;
 		case 'choose-value': //choices
-			activeNode.choice = activeNode.choices[selectedChoice];
-			say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
-			mode = null;
+			activeNode.readFull();
 			break;
 		default:
 			if(activeNode.children.length > 0) {
@@ -256,7 +254,8 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 		case 'choose-value': //choices
 			if(0 < selectedChoice) {
 				selectedChoice--;
-				say(activeNode.choices[selectedChoice]);
+				activeNode.choice = activeNode.choices[selectedChoice];
+				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
 			} else {
 				say("You have reached the bottom of the list of choices.");
 				
@@ -293,7 +292,8 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 		case 'choose-value': //choices
 			if((selectedChoice + 1) < activeNode.choices.length) {
 				selectedChoice++;
-				say(activeNode.choices[selectedChoice]);
+				activeNode.choice = activeNode.choices[selectedChoice];
+				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
 			} else {
 				say("You have reached the top of the list of choices.");
 			}
