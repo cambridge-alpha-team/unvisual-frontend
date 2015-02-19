@@ -228,6 +228,12 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					say("How slowly do you want to go from full amplitude to silence? Choose a value between 0 and 5: " + activeNode.choices[selectedChoice]);
 				} else if(activeNode.name == "tempo") {
 					say("Choose a tempo for your piece between 60 and 180: " + activeNode.choices[selectedChoice]);
+				} else if(activeNode.name == "synth name") {
+					say("Choose a synth: " + activeNode.choices[selectedChoice]);
+				} else if(activeNode.name == "fx name") {
+					say("Choose an effect: " + activeNode.choices[selectedChoice]);
+				} else if(activeNode.name == "sample name") {
+					say("Choose a sample: " + activeNode.choices[selectedChoice]);
 				}
 			}
 			break;
