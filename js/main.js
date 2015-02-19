@@ -259,7 +259,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 				say(activeNode.choices[selectedChoice]);
 			} else {
 				say("You have reached the bottom of the list of choices.");
-				selectedChoice = -1;
+				
 			}
 			break;
 		case 'delete': //delete
@@ -296,7 +296,6 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 				say(activeNode.choices[selectedChoice]);
 			} else {
 				say("You have reached the top of the list of choices.");
-				selectedChoice = activeNode.choices.length;
 			}
 			break;
 		case 'delete': //delete
