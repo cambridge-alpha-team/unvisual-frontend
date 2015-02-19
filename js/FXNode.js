@@ -55,6 +55,9 @@ FXNode.prototype.generateHTML = function() {
 			sonicPi += "\n";
 		}
 	}
+	if(isBoxed(this.children[i-1])) {
+		sonicPi += "<span>";
+	}
 	sonicPi += "end";
 	if(this == activeNode) {
 		sonicPi += '</pre>';
