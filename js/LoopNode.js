@@ -43,6 +43,9 @@ LoopNode.prototype.generateHTML = function() {
 		sonicPi += "\n";
 	}
 	for (var i = 0; i < this.children.length; i++) {
+		if(isBoxed(this.children[i-1])) {
+			sonicPi += "<span>";
+		}
 		sonicPi += indent(indent(this.children[i].generateHTML()));
 		if(!isBoxed(this.children[i+1]) && !isBoxed(this.children[i])) {
 			sonicPi += "\n";
