@@ -40,7 +40,7 @@ Mousetrap.bind(['c'], function() {
 			selectedCubelet = activeNode.cubelet;
 		}
 	}
-	reGenerate();
+	regenerate();
 	return false;
 });
 
@@ -57,7 +57,7 @@ Mousetrap.bind(['plus'], function() {
 		} else {
 			say("Adding code cancelled");
 		}
-		reGenerate();
+		regenerate();
 	}
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
@@ -77,7 +77,7 @@ Mousetrap.bind(['minus'], function() {
 		} else {
 			say("Delete cancelled");
 		}
-		reGenerate();
+		regenerate();
 	}
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
@@ -111,7 +111,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			}
 			break;
 	}
-	reGenerate();
+	regenerate();
 	return false;
 });
 
@@ -216,7 +216,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			}
 			break;
 	}
-	reGenerate();
+	regenerate();
 	return false;
 });
 
@@ -254,7 +254,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			say(activeNode.readFull());
 			break;
 	}
-	reGenerate();
+	regenerate();
 	return false;
 });
 
@@ -291,16 +291,16 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			say(activeNode.readFull());
 			break;
 	}
-	reGenerate();
+	regenerate();
 	return false;
 });
 
 // called when tree is updated
-function reGenerate() {
+function regenerate() {
 	document.getElementById("message").innerHTML = root.generateHTML();
 }
 
-reGenerate();
+regenerate();
 
 
 // shortcut to stop all Sonic Pi loops
