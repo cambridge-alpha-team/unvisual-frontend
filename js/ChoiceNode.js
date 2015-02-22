@@ -2,10 +2,10 @@ function ChoiceNode(name, parent, choices) {
 	this.name = name;
 	this.parent = parent || null;
 	this.children = [];
-	if(parent != null) {
+	if (parent != null) {
 		parent.children.splice(0, 0, this);
 	}
-	
+
 	this.choices = choices;
 	this.choice = choices[0];
 }
@@ -21,12 +21,13 @@ ChoiceNode.prototype.generateCode = function() {
 
 ChoiceNode.prototype.generateHTML = function() {
 	var sonicPi = '';
-	if(this == activeNode) {
+	if (this == activeNode) {
 		sonicPi += '<pre style="font-size: 1em; border: black 2px solid; display: inline">';
 	}
 	sonicPi += this.choice;
-	if(this == activeNode) {
+	if (this == activeNode) {
 		sonicPi += '</pre>';
 	}
 	return sonicPi;
 };
+
