@@ -42,9 +42,6 @@ FXNode.prototype.generateHTML = function() {
 	if (this == activeNode) {
 		sonicPi += '<pre style="margin: 0px; font-size: 1em; border: black 2px solid"><span>';
 	}
-	if (this == activeNode) {
-		//sonicPi += '<pre style="font-size: 1em; margin: 0px; border: black 2px solid">';
-	}
 	sonicPi += "with_fx :" + this.children[0].generateHTML() + " do";
 	if (!(isBoxed(this.children[1]))) {
 		sonicPi += "\n";

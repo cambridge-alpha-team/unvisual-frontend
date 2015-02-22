@@ -8,7 +8,7 @@ var selectedChoice;
 var loopNumber = 1; //to uniquely name loops
 
 
-//tests XXX
+// make initial loop
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 
 //speech
@@ -295,13 +295,6 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 // called when tree is updated
 function reGenerate() {
 	document.getElementById("message").innerHTML = root.generateHTML();
-	/*
-	document.getElementById("message").innerHTML = '';
-	
-	var code = root.generateCode();
-	var node = document.createTextNode(code);
-	document.getElementById('message').appendChild(node);
-	*/
 }
 
 reGenerate();
