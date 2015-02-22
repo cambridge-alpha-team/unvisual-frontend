@@ -22,7 +22,7 @@ function say(message) {
 }
 
 //shortcut to make cubelet controlled
-Mousetrap.bind(['command+c', 'ctrl+c'], function() {
+Mousetrap.bind(['c'], function() {
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	if (activeNode.name == "fx"
@@ -42,7 +42,7 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 });
 
 //shortcut to add a node
-Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
+Mousetrap.bind(['plus'], function() {
 	if (['root', 'fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
@@ -63,7 +63,7 @@ Mousetrap.bind(['command+a', 'ctrl+a', 'plus'], function() {
 });
 
 //shortcut to delete a node
-Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
+Mousetrap.bind(['minus'], function() {
 	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
@@ -76,31 +76,6 @@ Mousetrap.bind(['command+d', 'ctrl+d', 'minus'], function() {
 		}
 		reGenerate();
 	}
-	// return false to prevent default browser behaviour
-	// and stop event from bubbling
-	return false;
-
-});
-
-//shortcut to save code
-Mousetrap.bind(['command+s', 'ctrl+s'], function() {
-	reGenerate();
-	// return false to prevent default browser behaviour
-	// and stop event from bubbling
-	return false;
-});
-
-//shortcut to open code
-Mousetrap.bind(['command+o', 'ctrl+o'], function() {
-	reGenerate();
-	// return false to prevent default browser behaviour
-	// and stop event from bubbling
-	return false;
-});
-
-//shortcut to run code
-Mousetrap.bind(['command+r', 'ctrl+r'], function() {
-	reGenerate();
 	// return false to prevent default browser behaviour
 	// and stop event from bubbling
 	return false;
