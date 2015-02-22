@@ -26,8 +26,6 @@ function say(message) {
 
 //shortcut to make cubelet controlled
 Mousetrap.bind(['c'], function() {
-	// return false to prevent default browser behaviour
-	// and stop event from bubbling
 	if (activeNode.name == "fx"
 		|| activeNode.name == "play"
 		|| activeNode.name == "sleep"
@@ -59,8 +57,6 @@ Mousetrap.bind(['plus'], function() {
 		}
 		regenerate();
 	}
-	// return false to prevent default browser behaviour
-	// and stop event from bubbling
 	return false;
 
 });
@@ -79,8 +75,6 @@ Mousetrap.bind(['minus'], function() {
 		}
 		regenerate();
 	}
-	// return false to prevent default browser behaviour
-	// and stop event from bubbling
 	return false;
 
 });
