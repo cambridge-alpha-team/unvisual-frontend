@@ -386,7 +386,6 @@ function handleKey(e) {
 			return false;
 		case 52:
 		case 55:
-		case 100:
 		case 121:
 		case 122:
 			Mousetrap.trigger('left');
