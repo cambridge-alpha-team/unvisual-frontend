@@ -1,11 +1,14 @@
+var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
+
+var loopNumber = 1; // to uniquely name loops
+
 var root = new RootNode();
 var activeNode = new TempoNode();
+
 var mode = null; // null | 'add' | 'bind-cubelet' | 'delete' | 'choose-value'
-var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
 var selectedCodeType;
 var selectedCubelet;
 var selectedChoice;
-var loopNumber = 1; //to uniquely name loops
 
 
 // make initial loop
