@@ -341,36 +341,3 @@ var request = function(method, url, body, resolve, reject) {
 	xhr.send(body);
 };
 
-
-function handleKey(e) {
-	console.log(e.keyCode);
-	switch (e.keyCode) {
-		case 50:
-		case 98:
-			Mousetrap.trigger('down');
-			return false;
-		case 52:
-		case 55:
-		case 121:
-		case 122:
-			Mousetrap.trigger('left');
-			return false;
-		case 54:
-		case 102:
-			Mousetrap.trigger('right');
-			return false;
-		case 56:
-		case 104:
-			Mousetrap.trigger('up');
-			return false;
-		case 45:
-			Mousetrap.trigger('minus');
-			return false;
-		case 43:
-			Mousetrap.trigger('plus');
-			return false;
-		default:
-	}
-}
-document.body.addEventListener('keypress', handleKey);
-
