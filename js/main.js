@@ -37,15 +37,15 @@ function addChildNode(childNode, parentNode, index) {
 function addNode(currentNode, parentNode, index, codeType) {
 	switch(codeType) {
 		case 0:	// loop
-			activeNode = new LoopNode("loop" + loopNumber++, parentNode, index/*(parentNode.children.indexOf(currentNode) + 1)*/);
+			activeNode = new LoopNode("loop" + loopNumber++, parentNode, index);
 			say("New loop created");
 			break;
 		case 1:	// play
-			activeNode = new PlayNode(parentNode, index/*(parentNode.children.indexOf(currentNode) + 1)*/);
+			activeNode = new PlayNode(parentNode, index);
 			say("New note created");
 			break;
 		case 2:	// sleep
-			activeNode = new SleepNode(parentNode, index/*(parentNode.children.indexOf(currentNode) + 1)*/);
+			activeNode = new SleepNode(parentNode, index);
 			say("New rest created");
 			break;
 		case 3:	// fx
@@ -53,11 +53,11 @@ function addNode(currentNode, parentNode, index, codeType) {
 			say("New FX created");
 			break;
 		case 4:	// synth
-			activeNode = new SynthNode(parentNode, index/*(parentNode.children.indexOf(currentNode) + 1)*/);
+			activeNode = new SynthNode(parentNode, index);
 			say("New synth created");
 			break;
 		case 5:	// sample
-			activeNode = new SampleNode(parentNode, index/*(parentNode.children.indexOf(currentNode) + 1)*/);
+			activeNode = new SampleNode(parentNode, index);
 			say("New sample created");
 			break;
 		default:	// something's wrong
@@ -128,7 +128,6 @@ Mousetrap.bind(['command+c', 'ctrl+c'], function() {
 		if (mode == 'bind-cubelet') {
 			say("selecting cubelet");
 			selectedCubelet = activeNode.cubelet;
-			console.log("selectedCubelet = " + selectedCubelet);
 		} else {
 			say("Cubelet selection cancelled. The currently selected bit of code is " + activeNode.readFull());
 		}
@@ -210,34 +209,26 @@ Mousetrap.bind(['command+z', 'ctrl+z'], function() {
 	if (actions.length > 0 && actionIndex >= 0) {
 		switch(actions[actionIndex]) {
 			case 'add':	// add code
-				console.log("Undo add");
-				// Determine the index of actionRefs[actionIndex] in the parent's array of children
 				if (deleteNode(actionRefs[actionIndex])) {
 					actionIndex--;
 					say("Adding code undone. The currently selected bit of code is " + activeNode.readFull());
 				}
 				break;
 			case 'bind-cubelet':	// select cubelet
-				console.log("Undo bind-cubelet");
-				//mode = null;
 				bindCubelet(actionRefs[actionIndex][0], actionRefs[actionIndex][1]);
 				actionIndex--;
 				say("Cubelet selection undone. The currently selected bit of code is " + activeNode.readFull());
 				break;
 			case 'delete':	// delete
-				console.log("Undo delete");
-				//mode = null;
 				addChildNode(actionRefs[actionIndex][0], actionRefs[actionIndex][1], actionRefs[actionIndex][2]);
 				actionIndex--;
 				say("Delete undone. The currently selected bit of code is " + activeNode.readFull());
 				break;
 			case 'choose-value': //choices
-				console.log("Undo choose-value");
 				if (modValue(actionRefs[actionIndex][0], actionRefs[actionIndex][2], actionRefs[actionIndex][1] - actionRefs[actionIndex][2])) {
 					actionIndex--;
 					say("Choose value undone. The currently selected bit of code is " + activeNode.readFull());
 				}
-				//mode = null;
 				break;
 			default:
 				console.log("ERROR: Action not recognised.");
@@ -258,19 +249,16 @@ Mousetrap.bind(['command+y', 'ctrl+y'], function() {
 	if (actions.length > 0 && actionIndex + 1 < actions.length) {
 		switch(actions[actionIndex + 1]) {
 			case 'add':	// add code
-				console.log("Redo add");
 				actionIndex++;
 				addChildNode(actionRefs[actionIndex][0], actionRefs[actionIndex][1], actionRefs[actionIndex][2]);
 				say("Adding code redone. The currently selected bit of code is " + activeNode.readFull());
 				break;
 			case 'bind-cubelet':	// select cubelet
-				console.log("Redo bind-cubelet");
 				actionIndex++;
 				bindCubelet(actionRefs[actionIndex][0], actionRefs[actionIndex][2]);
 				say("Cubelet selection redone. The currently selected bit of code is " + activeNode.readFull());
 				break;
 			case 'delete':	// delete
-				console.log("Redo delete");
 				actionIndex++;
 				if (deleteNode(actionRefs[actionIndex][0])) {
 					say("Delete redone. The currently selected bit of code is " + activeNode.readFull());
@@ -279,7 +267,6 @@ Mousetrap.bind(['command+y', 'ctrl+y'], function() {
 				}
 				break;
 			case 'choose-value': //choices
-				console.log("Redo choose-value");
 				actionIndex++;
 				if (modValue(actionRefs[actionIndex][0], actionRefs[actionIndex][1], actionRefs[actionIndex][2] - actionRefs[actionIndex][1])) {
 					say("Choose value redone. The currently selected bit of code is " + activeNode.readFull());
