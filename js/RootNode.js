@@ -17,9 +17,10 @@ RootNode.prototype.generateHTML = function() {
 	var sonicPi = '';
 	for (var i = 0; i < this.children.length; i++) {
 		sonicPi += (this.children[i].generateHTML() + "\n");
-		if(!isBoxed(this.children[i])) {
+		if (!isBoxed(this.children[i])) {
 			sonicPi += "\n";
 		}
 	}
 	return sonicPi;
 };
+

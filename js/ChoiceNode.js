@@ -7,7 +7,7 @@ function ChoiceNode(name, parent, choices, childNumber) {
 	} else if(parent != null) {
 		parent.children.splice(0, 0, this);
 	}
-	
+
 	this.choices = choices;
 	this.choice = choices[0];
 }
@@ -29,18 +29,19 @@ ChoiceNode.prototype.generateCode = function() {
 
 ChoiceNode.prototype.generateHTML = function() {
 	var sonicPi = '';
-	if(this == activeNode) {
+	if (this == activeNode) {
 		sonicPi += '<pre style="font-size: 1em; border: black 2px solid; display: inline">';
 	}
-	if(this.name == "sample") {
+	if (this.name == "sample") {
 		sonicPi += "sample :" + this.choice;
-	} else if(this.name == "synth") {
+	} else if (this.name == "synth") {
 		sonicPi += "use_synth :" + this.choice;
 	} else {
 		sonicPi += this.choice;
 	}
-	if(this == activeNode) {
+	if (this == activeNode) {
 		sonicPi += '</pre>';
 	}
 	return sonicPi;
 };
+
