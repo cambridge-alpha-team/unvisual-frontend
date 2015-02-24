@@ -9,12 +9,12 @@ function ValueNode(name, parent, childNumber, defaultValue, min, max, stepSize) 
 	}
 	this.choice = defaultValue;
 	this.cubelet = 0;
-	this.Min = min;
-	this.Max = max;
+	this.min = min;
+	this.max = max;
 	
 	this.choices = [];
-	var increments = stepSize || 1;
-	for(var i = min; i < max; i = i + increments) {
+	this.stepSize = stepSize || 1;
+	for(var i = min; i < max; i = i + this.stepSize) {
 		this.choices.push(i);
 	}
 	this.choices.push(max);
@@ -25,14 +25,29 @@ ValueNode.prototype.readName = function() {
 	return this.name + " " + this.choice;
 };
 
+ValueNode.prototype.getValueCode = function() {
+	var sonicPi = '';
+	if (this.cubelet == 0) {
+		sonicPi += this.choice;
+	} else {
+		sonicPi += 'getCubeletValue('
+						+ this.cubelet + ', '
+						+ this.min + ', '
+						+ this.max + ', '
+						+ this.stepSize + ', '
+						+ this.choice + ')';
+	}
+	return sonicPi;
+};
+
 ValueNode.prototype.generateCode = function() {
 	var sonicPi = "";
 	if(this.name == "sleep") {
-		sonicPi += "sleep " + this.choice;
+		sonicPi += "sleep " + this.getValueCode();
 	} else if (this.name == "tempo") {
 		sonicPi += (
             "define :tempo do\n" +
-            indent("return " + this.choice + "\n") +
+            indent("return " + this.getValueCode() + "\n") +
             "end\n" +
             "\n" +
             "live_loop :beat do\n" +
@@ -44,7 +59,22 @@ ValueNode.prototype.generateCode = function() {
             "end"
         );
 	} else {
-		sonicPi += this.name + ": " + this.choice;
+		sonicPi += this.name + ": " + this.getValueCode();
+	}
+	return sonicPi;
+};
+
+ValueNode.prototype.getValueHTML = function() {
+	var sonicPi = '';
+	if (this.cubelet == 0) {
+		sonicPi += this.choice;
+	} else {
+		sonicPi += 'getCubeletValue('
+						+ this.cubelet + ', '
+						+ this.min + ', '
+						+ this.max + ', '
+						+ this.stepSize + ', '
+						+ this.choice + ')';
 	}
 	return sonicPi;
 };
@@ -60,11 +90,11 @@ ValueNode.prototype.generateHTML = function() {
 	}
 	
 	if(this.name == "sleep") {
-		sonicPi += "sleep " + this.choice;
+		sonicPi += "sleep " + this.getValueHTML();
 	} else if (this.name == "tempo") {
 		sonicPi += (
             "define :tempo do\n" +
-            indent("return " + this.choice + "\n") +
+            indent("return " + this.getValueHTML() + "\n") +
             "end\n" +
             "\n" +
             "live_loop :beat do\n" +
@@ -76,7 +106,7 @@ ValueNode.prototype.generateHTML = function() {
             "end"
         );
 	} else {
-		sonicPi += this.name + ": " + this.choice;
+		sonicPi += this.name + ": " + this.getValueHTML();
 	}
 	if(this == activeNode) {
 		sonicPi += '</pre>';

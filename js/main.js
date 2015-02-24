@@ -26,17 +26,17 @@ function say(message) {
 
 //shortcut to make cubelet controlled
 Mousetrap.bind(['c'], function() {
-	if (activeNode.name == "fx"
-		|| activeNode.name == "play"
-		|| activeNode.name == "sleep"
-		|| activeNode.name == "sample"
-		|| activeNode.name == "tempo") {
-		selectCubelet = !selectCubelet;
-		if (selectCubelet) {
-			addCode = false;
-			say("selecting cubelet");
+	if (activeNode instanceof ValueNode) {
+		if (mode != 'bind-cubelet') {
+			mode = 'bind-cubelet';
 			selectedCubelet = activeNode.cubelet;
+			say("Selecting cubelet. Cubelet " + selectedCubelet);
+		} else {
+			mode = null;
+			say("Stop selecting cubelet. " + activeNode.readFull());
 		}
+	} else {
+		say("You cannot control this with the cubelets. Please select a number. " + activeNode.readFull());
 	}
 	regenerate();
 	return false;
@@ -53,7 +53,7 @@ Mousetrap.bind(['plus', '+'], function() {
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else {
-			say("Adding code cancelled");
+			say("Adding code cancelled. " + activeNode.readName());
 		}
 		regenerate();
 	}
@@ -88,7 +88,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			break;
 		case 'bind-cubelet': // select cubelet
 			mode = null;
-			say("Cubelet selection cancelled. The currently selected bit of code is " + activeNode.readFull());
+			say("Cubelet set to " + activeNode.cubelet + ". The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'delete': // delete
 			mode = null;
@@ -146,13 +146,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			mode = null;
 			break;
 		case 'bind-cubelet': // select cubelet
-			activeNode.cubelet = selectedCubelet;
-			if (selectedCubelet > 0) {
-				say("Cubelet " + selectedCubelet + " selected.");
-			} else {
-				say("No cubelet selected.");
-			}
-			mode = null;
+			//Do nothing
 			break;
 		case 'delete': // delete
 			// Determine the index of activeNode in the parent's array of children
@@ -180,7 +174,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			mode = null;
 			break;
 		case 'choose-value': //choices
-			activeNode.readFull();
+			//Do nothing 
 			break;
 		default:
 			if (activeNode.children.length > 0) {
@@ -224,8 +218,9 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			break;
 		case 'bind-cubelet': // select cubelet
-			if (selectedCubelet > 0) {
+			if (0 < selectedCubelet) {
 				selectedCubelet--;
+				activeNode.cubelet = selectedCubelet;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
@@ -264,6 +259,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 		case 'bind-cubelet': // select cubelet
 			if (selectedCubelet < 6) {
 				selectedCubelet++;
+				activeNode.cubelet = selectedCubelet;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
