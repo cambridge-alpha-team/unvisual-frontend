@@ -97,7 +97,7 @@ function deleteNode(currentNode) {
 		say("Code deleted. The currently selected bit of code is " + activeNode.readFull());
 		return true;
 	} else {
-		say("ERROR: The currently selected bit of code is not recognised as a child by its parent.");
+		say("ERROR: index = " + index + ". Node \"" + currentNode.name + "\" could not be deleted because it is not recognised as a child by node \"" + currentNode.parent.name + "\".");
 		return false;
 	}
 }
@@ -209,10 +209,12 @@ Mousetrap.bind(['command+z', 'ctrl+z'], function() {
 	if (actions.length > 0 && actionIndex >= 0) {
 		switch(actions[actionIndex]) {
 			case 'add':	// add code
-				if (deleteNode(actionRefs[actionIndex])) {
-					actionIndex--;
+				if (deleteNode(actionRefs[actionIndex][0])) {
 					say("Adding code undone. The currently selected bit of code is " + activeNode.readFull());
+				} else {
+					console.log("ERROR: deleteNode(" + actionRefs[actionIndex].name + ") failed.");
 				}
+				actionIndex--;
 				break;
 			case 'bind-cubelet':	// select cubelet
 				bindCubelet(actionRefs[actionIndex][0], actionRefs[actionIndex][1]);
@@ -353,10 +355,10 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			}
 			if (actions.length > 0) {
 				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, activeNode);
+				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, activeNode.parent, activeNode.parent.children.indexOf(activeNode)]);
 			} else {
 				actions.push(mode);
-				actionRefs.push(activeNode);
+				actionRefs.push([activeNode, activeNode.parent, activeNode.parent.children.indexOf(activeNode)]);
 			}
 			actionIndex++;
 			say(activeNode.readFull());
@@ -383,6 +385,14 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 		case 'delete':	// delete
 			// Determine the index of activeNode in the parent's array of children
 			var index = activeNode.parent.children.indexOf(activeNode);
+			if (actions.length > 0) {
+				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, activeNode.parent, index]);
+			} else {
+				actions.push(mode);
+				actionRefs.push([activeNode, activeNode.parent, index]);
+			}
+			actionIndex++;
 			if(index >= 0) {
 				if(activeNode.name == "fx") {
 					// Parent activeNode's children to activeNode's parent
@@ -392,14 +402,6 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						childNode.parent = activeNode.parent;
 					}
 				}
-				if (actions.length > 0) {
-					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, activeNode.parent, index]);
-				} else {
-					actions.push(mode);
-					actionRefs.push([activeNode, activeNode.parent, index]);
-				}
-				actionIndex++;
 				// Remove activeNode from its parent's list of children
 				activeNode.parent.children.splice(index, 1);
 				if(index > 0) {
