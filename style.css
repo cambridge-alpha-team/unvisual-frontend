@@ -14,7 +14,7 @@ pre {
   font-size: 1.5em;
 }
 
-#speech {
+#display {
   position: fixed;
   left: 0;
   right: 0;
@@ -27,15 +27,18 @@ pre {
   white-space: pre-wrap;
 }
 
-#speech:before, #speech:after {
+#display:before, #display:after {
   line-height: 1.75rem;
 }
 
-#speech:before {
+#display:before {
   content: "“";
 }
 
-#speech:after {
+#display:after {
   content: "”";
 }
 
+#speech {
+  opacity: 0;
+}

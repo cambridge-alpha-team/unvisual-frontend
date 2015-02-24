@@ -17,8 +17,17 @@ var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 //speech
 var speechNode = document.createTextNode('');
 document.getElementById('speech').appendChild(speechNode);
+var displayNode = document.createTextNode('');
+document.getElementById('display').appendChild(displayNode);
 
-function say(message) {
+var lastValueTime = 0;
+
+function say(message, kind) {
+	displayNode.textContent = message;
+	if (kind == 'value') {
+		if (new Date() - lastValueTime < 400) return;
+		lastValueTime = new Date();
+	}
 	speechNode.textContent = ''; // clear first to make sure it *changes*
 	speechNode.textContent = message;
 	console.log(message);
@@ -233,7 +242,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			if (0 < selectedChoice) {
 				selectedChoice--;
 				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+				say(activeNode.choices[selectedChoice], 'value');
 			} else {
 				say("You have reached the bottom of the list of choices.");
 
@@ -271,7 +280,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			if ((selectedChoice + 1) < activeNode.choices.length) {
 				selectedChoice++;
 				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+				say(activeNode.choices[selectedChoice], 'value');
 			} else {
 				say("You have reached the top of the list of choices.");
 			}
