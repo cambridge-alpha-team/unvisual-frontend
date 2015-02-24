@@ -14,24 +14,56 @@ var selectedChoice;
 // make initial loop
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 
-//speech
-var speechNode = document.createTextNode('');
-document.getElementById('speech').appendChild(speechNode);
-var displayNode = document.createTextNode('');
-document.getElementById('display').appendChild(displayNode);
+// speech
 
-var lastValueTime = 0;
-
-function say(message, kind) {
-	displayNode.textContent = message;
-	if (kind == 'value') {
-		if (new Date() - lastValueTime < 400) return;
-		lastValueTime = new Date();
-	}
-	speechNode.textContent = ''; // clear first to make sure it *changes*
-	speechNode.textContent = message;
-	console.log(message);
+function textify(el) {
+  var textNode = document.createTextNode('');
+  el.appendChild(textNode);
+  return textNode;
 }
+
+var say = (function() {
+  var speechNode = textify(document.getElementById('speech'));
+  var displayNode = textify(document.getElementById('display'));
+
+  var lastAnnounced = 0;
+
+  var currentSpeech = null;
+  var speakTimeout = null;
+
+  var say = function(message, kind) {
+    // always *display* message
+    displayNode.textContent = message;
+
+    // we might have been planning to say something
+    if (speakTimeout) clearTimeout(speakTimeout);
+
+    // if we're changing a value, don't speak it too often
+    if (kind == 'value') {
+      if (new Date() - lastAnnounced < 400) {
+        if (message == currentSpeech) return;
+
+        // make sure we speak the last value
+        // after the current thing has "finished"
+        speakTimeout = setTimeout(function() {
+          announce(message);
+        }, 400);
+        return;
+      }
+      lastAnnounced = new Date();
+    }
+
+    announce(message);
+  };
+
+  function announce(message) {
+    speechNode.textContent = ''; // clear first to make sure it *changes*
+    speechNode.textContent = message;
+    console.log(message);
+  }
+
+  return say;
+})();
 
 //shortcut to make cubelet controlled
 Mousetrap.bind(['c'], function() {
