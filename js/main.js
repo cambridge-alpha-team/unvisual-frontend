@@ -26,16 +26,14 @@ function say(message) {
 
 //shortcut to make cubelet controlled
 Mousetrap.bind(['c'], function() {
-	if (activeNode.name == "fx"
-		|| activeNode.name == "play"
-		|| activeNode.name == "sleep"
-		|| activeNode.name == "sample"
-		|| activeNode.name == "tempo") {
-		selectCubelet = !selectCubelet;
-		if (selectCubelet) {
-			addCode = false;
-			say("selecting cubelet");
+	if (activeNode instanceof ValueNode) {
+		if (mode != 'bind-cubelet') {
+			mode = 'bind-cubelet';
 			selectedCubelet = activeNode.cubelet;
+			say("Selecting cubelet. Cubelet " + selectedCubelet);
+		} else {
+			mode = null;
+			say("Stop selecting cubelet. " + activeNode.readName());
 		}
 	}
 	regenerate();
@@ -53,7 +51,7 @@ Mousetrap.bind(['plus'], function() {
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else {
-			say("Adding code cancelled");
+			say("Adding code cancelled. " + activeNode.readName());
 		}
 		regenerate();
 	}
