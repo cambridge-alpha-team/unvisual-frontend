@@ -28,7 +28,25 @@ function say(message) {
 	console.log(message);
 }
 
+function unparentNode(childNode) {
+	var index = childNode.parent.children.indexOf(childNode);
+	if (index >= 0) {
+		// Remove childNode from its parent's list of children
+		childNode.parent.children.splice(index, 1);
+	}
+	childNode.parent = null;
+}
+
 function addChildNode(childNode, parentNode, index) {
+	if (childNode.name == 'fx') {
+		for (var i = 0; i < childNode.children.length; i++) {
+			var childIndex = childNode.parent.children.indexOf(childNode.children[i]);
+			if (childIndex >= 0) {
+				childNode.parent.children.splice(childIndex, 1);
+			}
+		}
+	}
+	unparentNode(childNode);
 	childNode.parent = parentNode;
 	if (index < 0) index = 0;
 	if (index < parentNode.children.length) {
@@ -217,7 +235,7 @@ Mousetrap.bind(['command+z', 'ctrl+z'], function() {
 	} else {
 		say("There's nothing to undo.");
 	}
-	reGenerate();
+	regenerate();
 	return false;
 });
 
@@ -261,7 +279,7 @@ Mousetrap.bind(['command+y', 'ctrl+y'], function() {
 	} else {
 		say("There's nothing to redo.");
 	}
-	reGenerate();
+	regenerate();
 	return false;
 });
 
