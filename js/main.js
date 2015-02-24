@@ -41,7 +41,7 @@ Mousetrap.bind([ 'c' ], function() {
 
 // shortcut to add a node
 Mousetrap
-		.bind([ 'plus', 'command+a' ],
+		.bind([ 'plus' ],
 				function() {
 					if ([ 'root', 'fx' ].indexOf(activeNode.parent.name) < 0
 							&& activeNode.parent.name.substr(0, 4) != 'loop') {
