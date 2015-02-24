@@ -337,3 +337,22 @@ var request = function(method, url, body, resolve, reject) {
 	xhr.send(body);
 };
 
+
+// hack numpad key support into mousetrap
+
+var numpadKeys = {
+  98: 'down',
+  100: 'left',
+  102: 'right',
+  104: 'up',
+};
+
+document.body.addEventListener('keypress', function(e) {
+  var name = numpadKeys[e.keyCode];
+  if (name) {
+	Mousetrap.trigger(name);
+	e.preventDefault();
+	return false;
+  }
+});
+
