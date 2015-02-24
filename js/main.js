@@ -14,15 +14,56 @@ var selectedChoice;
 // make initial loop
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 
-//speech
-var speechNode = document.createTextNode('');
-document.getElementById('speech').appendChild(speechNode);
+// speech
 
-function say(message) {
-	speechNode.textContent = ''; // clear first to make sure it *changes*
-	speechNode.textContent = message;
-	console.log(message);
+function textify(el) {
+  var textNode = document.createTextNode('');
+  el.appendChild(textNode);
+  return textNode;
 }
+
+var say = (function() {
+  var speechNode = textify(document.getElementById('speech'));
+  var displayNode = textify(document.getElementById('display'));
+
+  var lastAnnounced = 0;
+
+  var currentSpeech = null;
+  var speakTimeout = null;
+
+  var say = function(message, kind) {
+    // always *display* message
+    displayNode.textContent = message;
+
+    // we might have been planning to say something
+    if (speakTimeout) clearTimeout(speakTimeout);
+
+    // if we're changing a value, don't speak it too often
+    if (kind == 'value') {
+      if (new Date() - lastAnnounced < 400) {
+        if (message == currentSpeech) return;
+
+        // make sure we speak the last value
+        // after the current thing has "finished"
+        speakTimeout = setTimeout(function() {
+          announce(message);
+        }, 400);
+        return;
+      }
+      lastAnnounced = new Date();
+    }
+
+    announce(message);
+  };
+
+  function announce(message) {
+    speechNode.textContent = ''; // clear first to make sure it *changes*
+    speechNode.textContent = message;
+    console.log(message);
+  }
+
+  return say;
+})();
 
 //shortcut to make cubelet controlled
 Mousetrap.bind(['c'], function() {
@@ -228,7 +269,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			if (0 < selectedChoice) {
 				selectedChoice--;
 				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+				say(activeNode.choices[selectedChoice], 'value');
 			} else {
 				say("You have reached the bottom of the list of choices.");
 
@@ -267,7 +308,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			if ((selectedChoice + 1) < activeNode.choices.length) {
 				selectedChoice++;
 				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+				say(activeNode.choices[selectedChoice], 'value');
 			} else {
 				say("You have reached the top of the list of choices.");
 			}
