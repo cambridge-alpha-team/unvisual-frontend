@@ -228,7 +228,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			if (0 < selectedChoice) {
 				selectedChoice--;
 				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+				say(activeNode.choices[selectedChoice]);
 			} else {
 				say("You have reached the bottom of the list of choices.");
 
@@ -267,7 +267,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			if ((selectedChoice + 1) < activeNode.choices.length) {
 				selectedChoice++;
 				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+				say(activeNode.choices[selectedChoice]);
 			} else {
 				say("You have reached the top of the list of choices.");
 			}
