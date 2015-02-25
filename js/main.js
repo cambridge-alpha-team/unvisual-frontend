@@ -40,6 +40,7 @@ function unparentNode(childNode) {
 function addChildNode(childNode, parentNode, index) {
 	if (childNode.name == 'fx') {
 		for (var i = 0; i < childNode.children.length; i++) {
+			childNode.children[i].parent = childNode;
 			var childIndex = childNode.parent.children.indexOf(childNode.children[i]);
 			if (childIndex >= 0) {
 				childNode.parent.children.splice(childIndex, 1);
@@ -265,10 +266,10 @@ Mousetrap.bind(['command+y', 'ctrl+y'], function() {
 				actionIndex++;
 				if (modValue(actionRefs[actionIndex][0], actionRefs[actionIndex][1], actionRefs[actionIndex][2] - actionRefs[actionIndex][1])) {
 					say("Choose value redone. The currently selected bit of code is " + activeNode.readFull());
-					break;
 				} else {
 					actionIndex--;
 				}
+				break;
 			default:
 				console.log("ERROR: Action not recognised.");
 				if(activeNode.parent != root) {
