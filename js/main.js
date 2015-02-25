@@ -128,7 +128,17 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 					break;
 				case 3: // fx
-					response += "New FX added around " + activeNode.readName() + '. ';
+					response += "New FX added around " ;
+					for (var i = 0; i < activeNode.parent.children.length; i++){
+						response += activeNode.parent.children[i].readName();
+						if ( i == (activeNode.parent.children.length - 2))
+							response += " and ";
+						else if ( i == (activeNode.parent.children.length - 1))
+							response += ". ";
+						else 
+							response += ", ";
+					}
+					
 					activeNode = new FXNode(activeNode.parent);
 					break;
 				case 4: // synth
