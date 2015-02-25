@@ -111,38 +111,39 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 
 //shortcut to go into a list
 Mousetrap.bind(['right', 'd', 'l'], function() {
+	var response = '';
 	switch (mode) {
 		case 'add': // add code
 			switch (selectedCodeType) {
 				case 0: // loop
+					response += "New loop added after " + activeNode.readName() + '. ';
 					activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New loop created");
 					break;
 				case 1: // play
+					response += "New note added after " + activeNode.readName() + '. ';
 					activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New note created");
 					break;
 				case 2: // sleep
+					response += "New rest added after " + activeNode.readName() + '. ';
 					activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New rest created");
 					break;
 				case 3: // fx
+					response += "New FX added after " + activeNode.readName() + '. ';
 					activeNode = new FXNode(activeNode.parent);
-					say("New FX created");
 					break;
 				case 4: // synth
+					response += "New synth added after " + activeNode.readName() + '. ';
 					activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New synth created");
 					break;
 				case 5: // sample
+					response += "New sample added after " + activeNode.readName() + '. ';
 					activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New sample created");
 					break;
 				default: // something's wrong
 					say("ERROR When attempting to add code.");
 					break;
 			}
-			say(activeNode.readFull());
+			say(response + activeNode.readFull());
 			mode = null;
 			break;
 		case 'bind-cubelet': // select cubelet
