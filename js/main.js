@@ -9,6 +9,10 @@ var mode = null; // null | 'add' | 'bind-cubelet' | 'delete' | 'choose-value'
 var selectedCodeType;
 var selectedCubelet;
 var selectedChoice;
+var loopNumber = 1; //to uniquely name loops
+var actionIndex = -1;
+var actions = [];
+var actionRefs = [];
 
 // make initial loop
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
@@ -21,6 +25,116 @@ function say(message) {
 	speechNode.textContent = ''; // clear first to make sure it *changes*
 	speechNode.textContent = message;
 	console.log(message);
+}
+
+function unparentNode(childNode) {
+	var index = childNode.parent.children.indexOf(childNode);
+	if (index >= 0) {
+		// Remove childNode from its parent's list of children
+		childNode.parent.children.splice(index, 1);
+	}
+	childNode.parent = null;
+}
+
+function addChildNode(childNode, parentNode, index) {
+	if (childNode.name == 'fx') {
+		for (var i = 0; i < childNode.children.length; i++) {
+			childNode.children[i].parent = childNode;
+			var childIndex = childNode.parent.children.indexOf(childNode.children[i]);
+			if (childIndex >= 0) {
+				childNode.parent.children.splice(childIndex, 1);
+			}
+		}
+	}
+	unparentNode(childNode);
+	childNode.parent = parentNode;
+	if (index < 0) index = 0;
+	if (index < parentNode.children.length) {
+		parentNode.children.splice(index, 0, childNode);
+	} else {
+		parentNode.children.push(childNode);
+	}
+}
+
+function addNode(currentNode, parentNode, index, codeType) {
+	switch(codeType) {
+		case 0:	// loop
+			activeNode = new LoopNode("loop" + loopNumber++, parentNode, index);
+			say("New loop created");
+			break;
+		case 1:	// play
+			activeNode = new PlayNode(parentNode, index);
+			say("New note created");
+			break;
+		case 2:	// sleep
+			activeNode = new SleepNode(parentNode, index);
+			say("New rest created");
+			break;
+		case 3:	// fx
+			activeNode = new FXNode(parentNode);
+			say("New FX created");
+			break;
+		case 4:	// synth
+			activeNode = new SynthNode(parentNode, index);
+			say("New synth created");
+			break;
+		case 5:	// sample
+			activeNode = new SampleNode(parentNode, index);
+			say("New sample created");
+			break;
+		default:	// something's wrong
+			say("ERROR When attempting to add code.");
+			break;
+	}
+}
+
+function bindCubelet(currentNode, cubelet) {
+	currentNode.cubelet = cubelet;
+	if (cubelet > 0) {
+		say("Cubelet " + cubelet + " selected.");
+	} else {
+		say("No cubelet selected.");
+	}
+}
+
+function deleteNode(currentNode) {
+	// Determine the index of currentNode in the parent's array of children
+	var index = currentNode.parent.children.indexOf(currentNode);
+	if(index >= 0) {
+		if(currentNode.name == "fx") {
+			// Parent currentNode's children to currentNode's parent
+			for(var i = 1; i < currentNode.children.length; i++) {
+				var childNode = currentNode.children[i];
+				currentNode.parent.children.splice(index + i, 0, childNode);
+				childNode.parent = currentNode.parent;
+			}
+		}
+		// Remove currentNode from its parent's list of children
+		currentNode.parent.children.splice(index, 1);
+		if(index > 0) {
+			activeNode = currentNode.parent.children[index - 1];
+		} else {
+			activeNode = currentNode.parent.children[index];
+		}
+		say("Code deleted. The currently selected bit of code is " + activeNode.readFull());
+		return true;
+	} else {
+		say("ERROR: index = " + index + ". Node \"" + currentNode.name + "\" could not be deleted because it is not recognised as a child by node \"" + currentNode.parent.name + "\".");
+		return false;
+	}
+}
+
+function modValue(currentNode, currentChoice, delta) {
+	if(0 <= currentChoice + delta && currentChoice + delta <= currentNode.choices.length) {
+		currentChoice += delta;
+		selectedChoice = currentChoice;
+		currentNode.choice = currentNode.choices[selectedChoice];
+		say(currentNode.name + " set to " + currentNode.choices[selectedChoice]);
+		return true;
+	} else {
+		say("You have reached the bottom of the list of choices.");
+		return false;
+	}
 }
 
 //shortcut to make cubelet controlled
@@ -83,8 +197,94 @@ Mousetrap.bind(['minus', '-'], function() {
 	return false;
 });
 
-// shortcut to go out of list
-Mousetrap.bind([ 'left', 'a', 'h' ],function() {
+// shortcut to undo last action
+Mousetrap.bind(['command+z', 'ctrl+z'], function() {
+	if (actions.length > 0 && actionIndex >= 0) {
+		switch(actions[actionIndex]) {
+			case 'add':	// add code
+				if (deleteNode(actionRefs[actionIndex][0])) {
+					say("Adding code undone. The currently selected bit of code is " + activeNode.readFull());
+				} else {
+					console.log("ERROR: deleteNode(" + actionRefs[actionIndex].name + ") failed.");
+				}
+				actionIndex--;
+				break;
+			case 'bind-cubelet':	// select cubelet
+				bindCubelet(actionRefs[actionIndex][0], actionRefs[actionIndex][1]);
+				actionIndex--;
+				say("Cubelet selection undone. The currently selected bit of code is " + activeNode.readFull());
+				break;
+			case 'delete':	// delete
+				addChildNode(actionRefs[actionIndex][0], actionRefs[actionIndex][1], actionRefs[actionIndex][2]);
+				actionIndex--;
+				say("Delete undone. The currently selected bit of code is " + activeNode.readFull());
+				break;
+			case 'choose-value': //choices
+				if (modValue(actionRefs[actionIndex][0], actionRefs[actionIndex][2], actionRefs[actionIndex][1] - actionRefs[actionIndex][2])) {
+					actionIndex--;
+					say("Choose value undone. The currently selected bit of code is " + activeNode.readFull());
+				}
+				break;
+			default:
+				console.log("ERROR: Action not recognised.");
+				if(activeNode.parent != root) {
+					activeNode = activeNode.parent;
+				}
+				break;
+		}
+	} else {
+		say("There's nothing to undo.");
+	}
+	regenerate();
+	return false;
+});
+
+// shortcut to redo the last action to be undone
+Mousetrap.bind(['command+y', 'ctrl+y'], function() {
+	if (actions.length > 0 && actionIndex + 1 < actions.length) {
+		switch(actions[actionIndex + 1]) {
+			case 'add':	// add code
+				actionIndex++;
+				addChildNode(actionRefs[actionIndex][0], actionRefs[actionIndex][1], actionRefs[actionIndex][2]);
+				say("Adding code redone. The currently selected bit of code is " + activeNode.readFull());
+				break;
+			case 'bind-cubelet':	// select cubelet
+				actionIndex++;
+				bindCubelet(actionRefs[actionIndex][0], actionRefs[actionIndex][2]);
+				say("Cubelet selection redone. The currently selected bit of code is " + activeNode.readFull());
+				break;
+			case 'delete':	// delete
+				actionIndex++;
+				if (deleteNode(actionRefs[actionIndex][0])) {
+					say("Delete redone. The currently selected bit of code is " + activeNode.readFull());
+				} else {
+					actionIndex--;
+				}
+				break;
+			case 'choose-value': //choices
+				actionIndex++;
+				if (modValue(actionRefs[actionIndex][0], actionRefs[actionIndex][1], actionRefs[actionIndex][2] - actionRefs[actionIndex][1])) {
+					say("Choose value redone. The currently selected bit of code is " + activeNode.readFull());
+				} else {
+					actionIndex--;
+				}
+				break;
+			default:
+				console.log("ERROR: Action not recognised.");
+				if(activeNode.parent != root) {
+					activeNode = activeNode.parent;
+				}
+				break;
+		}
+	} else {
+		say("There's nothing to redo.");
+	}
+	regenerate();
+	return false;
+});
+
+//shortcut to go out of list
+Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch (mode) {
 		case 'add': // add code
 			mode = null;
@@ -196,6 +396,14 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						break;
 				}
 			}
+			if (actions.length > 0) {
+				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, activeNode.parent, activeNode.parent.children.indexOf(activeNode)]);
+			} else {
+				actions.push(mode);
+				actionRefs.push([activeNode, activeNode.parent, activeNode.parent.children.indexOf(activeNode)]);
+			}
+			actionIndex++;
 			say(response + activeNode.readFull());
 			mode = null;
 			break;
@@ -205,20 +413,30 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 		case 'delete': // delete
 		// Determine the index of activeNode in the parent's array of children
 			var index = activeNode.parent.children.indexOf(activeNode);
-			if (activeNode.name == "fx") {
-			// Parent activeNode's children to activeNode's parent
-				for ( var i = 1; i < activeNode.children.length; i++) {
-					var childNode = activeNode.children[i];
-					activeNode.parent.children.splice(index + i, 0, childNode);
-					childNode.parent = activeNode.parent;
-				}
-			}
-			// Remove activeNode from its parent's list of children
-			activeNode.parent.children.splice(index, 1);
-			if (index > 0) {
-				activeNode = activeNode.parent.children[index - 1];
+			if (actions.length > 0) {
+				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, activeNode.parent, index]);
 			} else {
-				activeNode = activeNode.parent.children[index];
+				actions.push(mode);
+				actionRefs.push([activeNode, activeNode.parent, index]);
+			}
+			actionIndex++;
+			if(index >= 0) {
+				if(activeNode.name == "fx") {
+					// Parent activeNode's children to activeNode's parent
+					for (var i = 1; i < activeNode.children.length; i++) {
+						var childNode = activeNode.children[i];
+						activeNode.parent.children.splice(index + i, 0, childNode);
+						childNode.parent = activeNode.parent;
+					}
+				}
+				// Remove activeNode from its parent's list of children
+				activeNode.parent.children.splice(index, 1);
+				if (index > 0) {
+					activeNode = activeNode.parent.children[index - 1];
+				} else {
+					activeNode = activeNode.parent.children[index];
+				}
 			}
 			mode = null;
 			break;
@@ -277,7 +495,18 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if (0 < selectedChoice) {
+			if(0 < selectedChoice) {
+				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+					actionRefs[actionIndex][2] = selectedChoice - 1;
+				} else if (actions.length > 0) {
+					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
+					actionIndex++;
+				} else {
+					actions.push(mode);
+					actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
+					actionIndex++;
+				}
 				selectedChoice--;
 				activeNode.choice = activeNode.choices[selectedChoice];
 				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
@@ -324,8 +553,19 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
-		case 'choose-value': // choices
-			if ((selectedChoice + 1) < activeNode.choices.length) {
+		case 'choose-value': //choices
+			if((selectedChoice + 1) < activeNode.choices.length) {
+				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+					actionRefs[actionIndex][2] = selectedChoice + 1;
+				} else if (actions.length > 0) {
+					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
+					actionIndex++;
+				} else {
+					actions.push(mode);
+					actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
+					actionIndex++;
+				}
 				selectedChoice++;
 				activeNode.choice = activeNode.choices[selectedChoice];
 				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
