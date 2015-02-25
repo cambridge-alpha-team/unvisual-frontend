@@ -14,11 +14,10 @@ var actionIndex = -1;
 var actions = [];
 var actionRefs = [];
 
-
 // make initial loop
 var loopA = new LoopNode("loop" + loopNumber++, root, 1);
 
-//speech
+// speech
 var speechNode = document.createTextNode('');
 document.getElementById('speech').appendChild(speechNode);
 
@@ -140,48 +139,49 @@ function modValue(currentNode, currentChoice, delta) {
 
 //shortcut to make cubelet controlled
 Mousetrap.bind(['c'], function() {
-	// return false to prevent default browser behaviour
-	// and stop event from bubbling
-	if (activeNode.parent.name == "fx"
-		|| activeNode.parent.name == "play"
-		|| activeNode.parent.name == "sleep"
-		|| activeNode.parent.name == "sample"
-		|| activeNode.parent.name == "tempo") {
-		mode = mode == 'bind-cubelet' ? null : 'bind-cubelet';
-		if (mode == 'bind-cubelet') {
-			say("selecting cubelet");
+	if (activeNode instanceof ValueNode) {
+		if (mode != 'bind-cubelet') {
+			mode = 'bind-cubelet';
 			selectedCubelet = activeNode.cubelet;
+			say("Selecting cubelet. Cubelet " + selectedCubelet);
 		} else {
-			say("Cubelet selection cancelled. The currently selected bit of code is " + activeNode.readFull());
+			mode = null;
+			say("Stop selecting cubelet. " + activeNode.readFull());
 		}
 	} else {
-		say("You can't assign a cubelet to this node.");
+		say("You cannot control this with the cubelets. Please select a number. " + activeNode.readFull());
 	}
 	regenerate();
 	return false;
 });
 
+
 //shortcut to add a node
-Mousetrap.bind(['plus'], function() {
+Mousetrap.bind(['plus', '+'], function() {
 	if (['root', 'fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
 		mode = mode == 'add' ? null : 'add';
 		if (mode == 'add') {
+			if (activeNode.parent.name.substr(0, 4) == 'loop') {
+				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+			} else {
+				codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+			}
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else {
-			say("Adding code cancelled");
+			say("Adding code cancelled. " + activeNode.readName());
 		}
 		regenerate();
 	}
 	return false;
-
 });
 
+
 //shortcut to delete a node
-Mousetrap.bind(['minus'], function() {
+Mousetrap.bind(['minus', '-'], function() {
 	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
@@ -195,7 +195,6 @@ Mousetrap.bind(['minus'], function() {
 		regenerate();
 	}
 	return false;
-
 });
 
 // shortcut to undo last action
@@ -293,13 +292,13 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			break;
 		case 'bind-cubelet': // select cubelet
 			mode = null;
-			say("Cubelet selection cancelled. The currently selected bit of code is " + activeNode.readFull());
+			say("Cubelet set to " + activeNode.cubelet + ". The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'delete': // delete
 			mode = null;
 			say("Delete cancelled. The currently selected bit of code is " + activeNode.readFull());
 			break;
-		case 'choose-value': //choices
+		case 'choose-value': // choices
 			say("Go out.   " + activeNode.readFull());
 			mode = null;
 			break;
@@ -314,38 +313,88 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 	return false;
 });
 
+
 //shortcut to go into a list
 Mousetrap.bind(['right', 'd', 'l'], function() {
+	var response = '';
 	switch (mode) {
 		case 'add': // add code
-			switch (selectedCodeType) {
-				case 0: // loop
-					activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New loop created");
-					break;
-				case 1: // play
-					activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New note created");
-					break;
-				case 2: // sleep
-					activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New rest created");
-					break;
-				case 3: // fx
-					activeNode = new FXNode(activeNode.parent);
-					say("New FX created");
-					break;
-				case 4: // synth
-					activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New synth created");
-					break;
-				case 5: // sample
-					activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-					say("New sample created");
-					break;
-				default: // something's wrong
-					say("ERROR When attempting to add code.");
-					break;
+			if (activeNode.parent.name.substr(0, 4) == 'loop') {
+				switch (selectedCodeType) {
+					case 0: // play
+						response += "New note added after " + activeNode.readName() + '. ';
+						activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 1: // sleep
+						response += "New rest added after " + activeNode.readName() + '. ';
+						activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 2: // fx
+						response += "New FX added around " ;
+						for (var i = 0; i < activeNode.parent.children.length; i++){
+							response += activeNode.parent.children[i].readName();
+							if ( i == (activeNode.parent.children.length - 2))
+								response += " and ";
+							else if ( i == (activeNode.parent.children.length - 1))
+								response += ". ";
+							else 
+								response += ", ";
+						}
+						
+						activeNode = new FXNode(activeNode.parent);
+						break;
+					case 3: // synth
+						response += "New synth added after " + activeNode.readName() + '. ';
+						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 4: // sample
+						response += "New sample added after " + activeNode.readName() + '. ';
+						activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					default: // something's wrong
+						say("ERROR When attempting to add code.");
+						break;
+				}
+			} else {
+				switch (selectedCodeType) {
+					case 0: // loop
+						response += "New loop added after " + activeNode.readName() + '. ';
+						activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 1: // play
+						response += "New note added after " + activeNode.readName() + '. ';
+						activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 2: // sleep
+						response += "New rest added after " + activeNode.readName() + '. ';
+						activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 3: // fx
+						response += "New FX added around " ;
+						for (var i = 0; i < activeNode.parent.children.length; i++){
+							response += activeNode.parent.children[i].readName();
+							if ( i == (activeNode.parent.children.length - 2))
+								response += " and ";
+							else if ( i == (activeNode.parent.children.length - 1))
+								response += ". ";
+							else 
+								response += ", ";
+						}
+						
+						activeNode = new FXNode(activeNode.parent);
+						break;
+					case 4: // synth
+						response += "New synth added after " + activeNode.readName() + '. ';
+						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 5: // sample
+						response += "New sample added after " + activeNode.readName() + '. ';
+						activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					default: // something's wrong
+						say("ERROR When attempting to add code.");
+						break;
+				}
 			}
 			if (actions.length > 0) {
 				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
@@ -355,29 +404,14 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				actionRefs.push([activeNode, activeNode.parent, activeNode.parent.children.indexOf(activeNode)]);
 			}
 			actionIndex++;
-			say(activeNode.readFull());
+			say(response + activeNode.readFull());
 			mode = null;
 			break;
 		case 'bind-cubelet': // select cubelet
-			var prevCubelet = activeNode.cubelet;
-			activeNode.cubelet = selectedCubelet;
-			if (selectedCubelet > 0) {
-				say("Cubelet " + selectedCubelet + " selected.");
-			} else {
-				say("No cubelet selected.");
-			}
-			if (actions.length > 0) {
-				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, prevCubelet, selectedCubelet]);
-			} else {
-				actions.push(mode);
-				actionRefs.push([activeNode, prevCubelet, selectedCubelet]);
-			}
-			actionIndex++;
-			mode = null;
+			//Do nothing
 			break;
 		case 'delete': // delete
-			// Determine the index of activeNode in the parent's array of children
+		// Determine the index of activeNode in the parent's array of children
 			var index = activeNode.parent.children.indexOf(activeNode);
 			if (actions.length > 0) {
 				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
@@ -403,14 +437,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				} else {
 					activeNode = activeNode.parent.children[index];
 				}
-				say("Code deleted. The currently selected bit of code is " + activeNode.readFull());
-			} else {
-				say("ERROR: The currently selected bit of code is not recognised as a child by its parent.");
 			}
 			mode = null;
 			break;
 		case 'choose-value': //choices
-			activeNode.readFull();
+			//Do nothing 
 			break;
 		default:
 			if (activeNode.children.length > 0) {
@@ -430,11 +461,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					say("How slowly do you want to go from full amplitude to silence? Choose a value between 0 and 5: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "tempo") {
 					say("Choose a tempo for your piece between 60 and 180: " + activeNode.choices[selectedChoice]);
-				} else if (activeNode.name == "synth name") {
+				} else if (activeNode.name == "synth") {
 					say("Choose a synth: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "fx name") {
 					say("Choose an effect: " + activeNode.choices[selectedChoice]);
-				} else if (activeNode.name == "sample name") {
+				} else if (activeNode.name == "sample") {
 					say("Choose a sample: " + activeNode.choices[selectedChoice]);
 				}
 			}
@@ -444,18 +475,22 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 	return false;
 });
 
-//shortcut to go to the next element in a list
-Mousetrap.bind(['down', 's', 'j'], function() {
+// shortcut to go to the next element in a list
+Mousetrap.bind([ 'down', 's', 'j' ], function() {
 	switch (mode) {
 		case 'add': // add code
 			if (selectedCodeType < (codeTypes.length - 1)) {
 				selectedCodeType++;
+				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
+						+ " of " + codeTypes.length);
+			} else {
+				say("You are at the bottom of the list");
 			}
-			say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			break;
 		case 'bind-cubelet': // select cubelet
-			if (selectedCubelet > 0) {
+			if (0 < selectedCubelet) {
 				selectedCubelet--;
+				activeNode.cubelet = selectedCubelet;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
@@ -477,34 +512,44 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
 			} else {
 				say("You have reached the bottom of the list of choices.");
-
 			}
 			break;
-		case 'delete': //delete
-			//do nothing
+		case 'delete': // delete
+			// do nothing
 			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
-			if ((n + 1) < activeNode.parent.children.length) activeNode = activeNode.parent.children[n + 1];
-			say(activeNode.readFull());
+			if ((n + 1) < activeNode.parent.children.length) {
+				activeNode = activeNode.parent.children[n + 1];
+				say(activeNode.readFull());
+			} else{
+				if (activeNode.parent.name == 'root')
+					say("You are at the bottom of the page.");
+				else
+					say("You can only go up, in or out from this point.");
+			}
 			break;
 	}
 	regenerate();
 	return false;
 });
 
-//shortcut to go to the previous element in a list
-Mousetrap.bind(['up', 'w', 'k'], function() {
+// shortcut to go to the previous element in a list
+Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 	switch (mode) {
 		case 'add': // add code
 			if (selectedCodeType > 0) {
 				selectedCodeType--;
+				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
+						+ " of " + codeTypes.length);
+			} else {
+				say("You are at the top of the list.");
 			}
-			say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			break;
 		case 'bind-cubelet': // select cubelet
 			if (selectedCubelet < 6) {
 				selectedCubelet++;
+				activeNode.cubelet = selectedCubelet;
 				say("Cubelet " + selectedCubelet);
 			}
 			break;
@@ -528,13 +573,20 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 				say("You have reached the top of the list of choices.");
 			}
 			break;
-		case 'delete': //delete
-			//do nothing
+		case 'delete': // delete
+			// do nothing
 			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
-			if (n != 0) activeNode = activeNode.parent.children[n - 1];
-			say(activeNode.readFull());
+			if (n != 0) {
+				activeNode = activeNode.parent.children[n - 1];
+				say(activeNode.readFull());
+			} else {
+				if (activeNode.parent.name == 'root')
+					say("You are at the top of the page.");
+				else 
+					say("You can only go down, in or out  from this point.");
+			}
 			break;
 	}
 	regenerate();
@@ -548,9 +600,8 @@ function regenerate() {
 
 regenerate();
 
-
 // shortcut to stop all Sonic Pi loops
-Mousetrap.bind(['*'], function() {
+Mousetrap.bind([ '*' ], function() {
 	request("POST", "osc/stop", "", function() {
 		console.log("Sent stop OSC");
 	}, function(err) {
@@ -560,7 +611,7 @@ Mousetrap.bind(['*'], function() {
 });
 
 // shortcut to send code to Sonic Pi
-Mousetrap.bind(['return', 'enter'], function() {
+Mousetrap.bind([ 'return', 'enter' ], function() {
 	var code = root.generateCode();
 
 	request("POST", "osc/run", code, function() {
@@ -592,4 +643,23 @@ var request = function(method, url, body, resolve, reject) {
 
 	xhr.send(body);
 };
+
+
+// hack numpad key support into mousetrap
+
+var numpadKeys = {
+  98: 'down',
+  100: 'left',
+  102: 'right',
+  104: 'up',
+};
+
+document.body.addEventListener('keypress', function(e) {
+  var name = numpadKeys[e.keyCode];
+  if (name) {
+	Mousetrap.trigger(name);
+	e.preventDefault();
+	return false;
+  }
+});
 
