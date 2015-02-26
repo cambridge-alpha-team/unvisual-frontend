@@ -177,7 +177,7 @@ Mousetrap.bind(['minus', '-'], function() {
 			}
 			actionIndex++;
 			if(index >= 0) {
-				if(activeNode.name == "fx") {
+				if(activeNode instanceof FXNode) {
 					// Parent activeNode's children to activeNode's parent
 					for (var i = 1; i < activeNode.children.length; i++) {
 						var childNode = activeNode.children[i];
