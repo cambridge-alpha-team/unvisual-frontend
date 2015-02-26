@@ -14,11 +14,7 @@ function LoopNode(name, parent, childNumber) {
 inherits(LoopNode, Node);
 
 LoopNode.prototype.readName = function() {
-	if (this.children[0] instanceof ValueNode || this.children[0] instanceof ChoiceNode) {
-		return this.name + " " + this.children[0].choice;
-	} else {
-		return this.name;
-	}
+	return this.name;
 };
 
 LoopNode.prototype.generateCode = function() {
