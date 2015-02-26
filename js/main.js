@@ -38,7 +38,7 @@ function unparentNode(childNode) {
 }
 
 function addChildNode(childNode, parentNode, index) {
-	if (childNode.name == 'fx') {
+	if (childNode instanceof FXNode) {
 		for (var i = 0; i < childNode.children.length; i++) {
 			childNode.children[i].parent = childNode;
 			var childIndex = childNode.parent.children.indexOf(childNode.children[i]);
@@ -70,7 +70,7 @@ function deleteNode(currentNode) {
 	// Determine the index of currentNode in the parent's array of children
 	var index = currentNode.parent.children.indexOf(currentNode);
 	if(index >= 0) {
-		if(currentNode.name == "fx") {
+		if(currentNode instanceof FXNode) {
 			// Parent currentNode's children to currentNode's parent
 			for(var i = 1; i < currentNode.children.length; i++) {
 				var childNode = currentNode.children[i];
@@ -127,7 +127,7 @@ Mousetrap.bind(['c'], function() {
 
 //shortcut to add a node
 Mousetrap.bind(['plus', '+'], function() {
-	if (['root', 'fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
+	if (['root', 'fx'].indexOf(activeNode.parent.name) < 0 && !(activeNode.parent instanceof LoopNode)) {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -160,7 +160,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode.name == 'fx name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && !(activeNode instanceof FXNode)) || activeNode.name == 'fx name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -426,7 +426,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			}
 			actionIndex++;
 			if(index >= 0) {
-				if(activeNode.name == "fx") {
+				if(activeNode instanceof FXNode) {
 					// Parent activeNode's children to activeNode's parent
 					for (var i = 1; i < activeNode.children.length; i++) {
 						var childNode = activeNode.children[i];
@@ -499,7 +499,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if (activeNode.name == 'sample') {
+			if (activeNode instanceof ChoiceNode) {
 				if ((selectedChoice + 1) < activeNode.choices.length) {
 					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
 						actionRefs[actionIndex][2] = selectedChoice + 1;
@@ -549,7 +549,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				activeNode = activeNode.parent.children[n + 1];
 				say(activeNode.readFull());
 			} else{
-				if (activeNode.parent.name == 'root')
+				if (activeNode.parent instanceof RootNode)
 					say("You are at the bottom of the page. " + activeNode.readFull());
 				else
 					say("You can only go up, in or out from this point. " + activeNode.readFull());
@@ -580,7 +580,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if (activeNode.name == 'sample') {
+			if (activeNode instanceof ChoiceNode) {
 				if (0 < selectedChoice) {
 					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
 						actionRefs[actionIndex][2] = selectedChoice - 1;
@@ -629,7 +629,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				activeNode = activeNode.parent.children[n - 1];
 				say(activeNode.readFull());
 			} else {
-				if (activeNode.parent.name == 'root')
+				if (activeNode.parent instanceof RootNode)
 					say("You are at the top of the page. " + activeNode.readFull());
 				else 
 					say("You can only go down, in or out  from this point. " + activeNode.readFull());
