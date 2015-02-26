@@ -23,6 +23,7 @@ inherits(ValueNode, Node);
 
 ValueNode.prototype.readName = function() {
 	return this.name + " " + this.choice;
+	
 };
 
 ValueNode.prototype.getValueCode = function() {
@@ -58,6 +59,8 @@ ValueNode.prototype.generateCode = function() {
             "end\n") +
             "end"
         );
+	} else if (this.name == "octave"){
+		sonicPi += this.getValueCode();
 	} else {
 		sonicPi += this.name + ": " + this.getValueCode();
 	}
@@ -97,7 +100,10 @@ ValueNode.prototype.generateHTML = function() {
             indent("return " + this.getValueHTML() + "\n") +
             "end"
         );
-	} else {
+	} else if (this.name == "octave"){
+		sonicPi += this.getValueHTML();
+	} 
+	else {
 		sonicPi += this.name + ": " + this.getValueHTML();
 	}
 	if(this == activeNode) {

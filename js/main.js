@@ -482,6 +482,12 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					say("Choose an effect: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "sample") {
 					say("Choose a sample: " + activeNode.choices[selectedChoice]);
+				} else if (activeNode.name == "tonic") {
+					say("Choose a tonic note: " + activeNode.choices[selectedChoice]);
+				} else if (activeNode.name == "octave") {
+					say("Choose an octave for your tonic note between 1 and 8: " + activeNode.choices[selectedChoice]);
+				} else if (activeNode.name == "chord type"){
+					say("Choose a type for your chord: " + activeNode.choices[selectedChoice]);
 				}
 			}
 			break;

@@ -22,6 +22,8 @@ ChoiceNode.prototype.generateCode = function() {
 		return "sample :" + this.choice;
 	} else if(this.name == "synth") {
 		return "use_synth :" + this.choice;
+	} else if (this.name == "chord type"){
+		sonicPi += ", :"+ this.choice;
 	} else {
 		return this.choice;
 	}
@@ -36,6 +38,8 @@ ChoiceNode.prototype.generateHTML = function() {
 		sonicPi += "sample :" + this.choice;
 	} else if (this.name == "synth") {
 		sonicPi += "use_synth :" + this.choice;
+	} else if (this.name == "chord type"){
+		sonicPi += ", :"+ this.choice;
 	} else {
 		sonicPi += this.choice;
 	}
