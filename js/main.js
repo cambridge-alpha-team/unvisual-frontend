@@ -43,7 +43,7 @@ Mousetrap.bind(['c'], function() {
 });
 
 //shortcut to add a node
-Mousetrap.bind(['+'], function() {
+Mousetrap.bind(['plus', '+'], function() {
 	if (['root', 'fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
@@ -62,7 +62,7 @@ Mousetrap.bind(['+'], function() {
 });
 
 //shortcut to delete a node
-Mousetrap.bind(['-'], function() {
+Mousetrap.bind(['minus', '-'], function() {
 	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
@@ -230,7 +230,7 @@ Mousetrap.bind(['down', 's', 'j'], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if (activeNode.name == 'sample') {
+			if (activeNode instanceof ChoiceNode) {
 				if ((selectedChoice + 1) < activeNode.choices.length) {
 					selectedChoice++;
 					activeNode.choice = activeNode.choices[selectedChoice];
@@ -278,7 +278,7 @@ Mousetrap.bind(['up', 'w', 'k'], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if (activeNode.name == 'sample') {
+			if (activeNode instanceof ChoiceNode) {
 				if (0 < selectedChoice) {
 					selectedChoice--;
 					activeNode.choice = activeNode.choices[selectedChoice];
