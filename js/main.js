@@ -185,7 +185,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx' && activeNode.parent.name.substring(0, 4) != 'loop') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx' && activeNode.parent.name.substr(0, 4) != 'loop') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -329,7 +329,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			var newNodeMsg = selectedCodePosition == 1 ? "at the start of " : "after ";
 			var newNodeParent = selectedCodePosition == 1 ? activeNode : activeNode.parent;
 			var newNodeIndex = selectedCodePosition == 1 ? 0 : (activeNode.parent.children.indexOf(activeNode) + 1);
-			if (activeNode.parent.name.substr(0, 4) == 'loop') {
+			if (activeNode.parent.name.substr(0, 4) == 'loop' || (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop')) {
 				switch (selectedCodeType) {
 					case 0: // play
 						response += "New note added " + newNodeMsg + activeNode.readName() + '. ';
@@ -460,6 +460,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			break;
 		case 'add-loop': // choose where to add code relative to a loop
 			selectedCodeType = 0;
+			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			mode = 'add';
 			break;
