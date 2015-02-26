@@ -56,38 +56,6 @@ function addChildNode(childNode, parentNode, index) {
 	}
 }
 
-function addNode(currentNode, parentNode, index, codeType) {
-	switch(codeType) {
-		case 0:	// loop
-			activeNode = new LoopNode("loop" + loopNumber++, parentNode, index);
-			say("New loop created");
-			break;
-		case 1:	// play
-			activeNode = new PlayNode(parentNode, index);
-			say("New note created");
-			break;
-		case 2:	// sleep
-			activeNode = new SleepNode(parentNode, index);
-			say("New rest created");
-			break;
-		case 3:	// fx
-			activeNode = new FXNode(parentNode);
-			say("New FX created");
-			break;
-		case 4:	// synth
-			activeNode = new SynthNode(parentNode, index);
-			say("New synth created");
-			break;
-		case 5:	// sample
-			activeNode = new SampleNode(parentNode, index);
-			say("New sample created");
-			break;
-		default:	// something's wrong
-			say("ERROR When attempting to add code.");
-			break;
-	}
-}
-
 function bindCubelet(currentNode, cubelet) {
 	currentNode.cubelet = cubelet;
 	if (cubelet > 0) {
