@@ -134,12 +134,11 @@ Mousetrap.bind(['plus', '+'], function() {
 		mode = mode == 'add' ? null : 'add';
 		if (mode == 'add') {
 				var ancestor = activeNode.parent;
-				if (ancestor.name == 'root') {
-					inLoop = false;
-					codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+				if (ancestor instanceof RootNode) {
+					codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
 				}
-				while (ancestor.name !== 'root') {
-					if (ancestor.name.substr(0,4) == 'loop'){
+				while (!(ancestor instanceof RootNode)) {
+					if (ancestor instanceof LoopNode){
 						inLoop = true;
 						codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
 					} else {
@@ -298,7 +297,33 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 	var response = '';
 	switch (mode) {
 		case 'add': // add code
-			if (inLoop) {
+			if(activeNode.parent instanceof RootNode){
+				switch (selectedCodeType) {
+				case 0: // loop
+					response += "New loop added after " + activeNode.readName() + '. ';
+					activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+					break;
+				case 1: // play
+					response += "New note added after " + activeNode.readName() + '. ';
+					activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+					break;
+				case 2: // sleep
+					response += "New rest added after " + activeNode.readName() + '. ';
+					activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+					break;
+				case 3: // synth
+					response += "New synth added after " + activeNode.readName() + '. ';
+					activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+					break;
+				case 4: // sample
+					response += "New sample added after " + activeNode.readName() + '. ';
+					activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+					break;
+				default: // something's wrong
+					say("ERROR When attempting to add code.");
+					break;
+				}
+			} else if (inLoop) {
 				switch (selectedCodeType) {
 					case 0: // play
 						response += "New note added after " + activeNode.readName() + '. ';
