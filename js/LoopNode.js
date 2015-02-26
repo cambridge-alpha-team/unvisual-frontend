@@ -37,8 +37,7 @@ LoopNode.prototype.generateHTML = function() {
 	if (this == activeNode) {
 		sonicPi += '<pre style="margin: 0px; font-size: 1em; border: black 2px solid"><span>';
 	}
-	sonicPi += "live_loop :" + this.name + " do\n";
-	sonicPi += indent("with_bpm tempo do");
+	sonicPi += "live_loop :" + this.name + " do";
 	if (!isBoxed(this.children[0])) {
 		sonicPi += "\n";
 	}
@@ -46,7 +45,7 @@ LoopNode.prototype.generateHTML = function() {
 		if(isBoxed(this.children[i-1])) {
 			sonicPi += "<span>";
 		}
-		sonicPi += indent(indent(this.children[i].generateHTML()));
+		sonicPi += indent(this.children[i].generateHTML());
 		if (!isBoxed(this.children[i + 1]) && !isBoxed(this.children[i])) {
 			sonicPi += "\n";
 		}
@@ -54,7 +53,6 @@ LoopNode.prototype.generateHTML = function() {
 	if(isBoxed(this.children[i-1])) {
 		sonicPi += "<span>";
 	}
-	sonicPi += indent("end\n");
 	sonicPi += "end";
 	if (this == activeNode) {
 		sonicPi += '</pre>';
