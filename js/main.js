@@ -1,4 +1,5 @@
 var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
+var inLoop = false;
 
 var loopNumber = 1; // to uniquely name loops
 
@@ -132,11 +133,21 @@ Mousetrap.bind(['plus', '+'], function() {
 	} else {
 		mode = mode == 'add' ? null : 'add';
 		if (mode == 'add') {
-			if (activeNode.parent.name.substr(0, 4) == 'loop') {
-				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
-			} else {
-				codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
-			}
+				var ancestor = activeNode.parent;
+				if (ancestor.name == 'root') {
+					inLoop = false;
+					codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+				}
+				while (ancestor.name !== 'root') {
+					if (ancestor.name.substr(0,4) == 'loop'){
+						inLoop = true;
+						codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+					} else {
+						inLoop = false;
+						codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+					}		
+					ancestor = ancestor.parent;
+				}
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else {
@@ -287,7 +298,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 	var response = '';
 	switch (mode) {
 		case 'add': // add code
-			if (activeNode.parent.name.substr(0, 4) == 'loop') {
+			if (inLoop) {
 				switch (selectedCodeType) {
 					case 0: // play
 						response += "New note added after " + activeNode.readName() + '. ';
