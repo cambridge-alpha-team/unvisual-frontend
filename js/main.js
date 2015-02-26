@@ -701,7 +701,7 @@ var numpadKeys = {
   104: 'up',
 };
 
-document.body.addEventListener('keypress', function(e) {
+document.body.addEventListener('keydown', function(e) {
   var name = numpadKeys[e.keyCode];
   if (name) {
 	Mousetrap.trigger(name);
