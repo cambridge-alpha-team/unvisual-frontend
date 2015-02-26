@@ -166,10 +166,36 @@ Mousetrap.bind(['minus', '-'], function() {
 	} else {
 		mode = mode == 'delete' ? null : 'delete';
 		if (mode == 'delete') {
-			say("Are you sure you want to delete this bit of code? Press right to confirm or left to cancel.");
-		} else {
-			say("Delete cancelled");
-		}
+			// Determine the index of activeNode in the parent's array of children
+			var index = activeNode.parent.children.indexOf(activeNode);
+			if (actions.length > 0) {
+				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, activeNode.parent, index]);
+			} else {
+				actions.push(mode);
+				actionRefs.push([activeNode, activeNode.parent, index]);
+			}
+			actionIndex++;
+			if(index >= 0) {
+				if(activeNode.name == "fx") {
+					// Parent activeNode's children to activeNode's parent
+					for (var i = 1; i < activeNode.children.length; i++) {
+						var childNode = activeNode.children[i];
+						activeNode.parent.children.splice(index + i, 0, childNode);
+						childNode.parent = activeNode.parent;
+					}
+				}
+				// Remove activeNode from its parent's list of children
+				activeNode.parent.children.splice(index, 1);
+				if (index > 0) {
+					activeNode = activeNode.parent.children[index - 1];
+				} else {
+					activeNode = activeNode.parent.children[index];
+				}
+			}
+			say("Code deleted. Press control+Z to undo. The currently selected bit of code is " + activeNode.readFull());
+			mode = null;
+		} 
 		regenerate();
 	}
 	return false;
@@ -273,8 +299,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			say("Cubelet set to " + activeNode.cubelet + ". The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'delete': // delete
-			mode = null;
-			say("Delete cancelled. The currently selected bit of code is " + activeNode.readFull());
+			// Do nothing
 			break;
 		case 'choose-value': // choices
 			say("Go out.   " + activeNode.readFull());
@@ -415,34 +440,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			//Do nothing
 			break;
 		case 'delete': // delete
-		// Determine the index of activeNode in the parent's array of children
-			var index = activeNode.parent.children.indexOf(activeNode);
-			if (actions.length > 0) {
-				actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-				actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, activeNode.parent, index]);
-			} else {
-				actions.push(mode);
-				actionRefs.push([activeNode, activeNode.parent, index]);
-			}
-			actionIndex++;
-			if(index >= 0) {
-				if(activeNode instanceof FXNode) {
-					// Parent activeNode's children to activeNode's parent
-					for (var i = 1; i < activeNode.children.length; i++) {
-						var childNode = activeNode.children[i];
-						activeNode.parent.children.splice(index + i, 0, childNode);
-						childNode.parent = activeNode.parent;
-					}
-				}
-				// Remove activeNode from its parent's list of children
-				activeNode.parent.children.splice(index, 1);
-				if (index > 0) {
-					activeNode = activeNode.parent.children[index - 1];
-				} else {
-					activeNode = activeNode.parent.children[index];
-				}
-			}
-			mode = null;
+			//Do nothing
 			break;
 		case 'choose-value': //choices
 			//Do nothing 
