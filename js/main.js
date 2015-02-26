@@ -1,4 +1,5 @@
 var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
+var inLoop = false;
 
 var loopNumber = 1; // to uniquely name loops
 
@@ -53,38 +54,6 @@ function addChildNode(childNode, parentNode, index) {
 		parentNode.children.splice(index, 0, childNode);
 	} else {
 		parentNode.children.push(childNode);
-	}
-}
-
-function addNode(currentNode, parentNode, index, codeType) {
-	switch(codeType) {
-		case 0:	// loop
-			activeNode = new LoopNode("loop" + loopNumber++, parentNode, index);
-			say("New loop created");
-			break;
-		case 1:	// play
-			activeNode = new PlayNode(parentNode, index);
-			say("New note created");
-			break;
-		case 2:	// sleep
-			activeNode = new SleepNode(parentNode, index);
-			say("New rest created");
-			break;
-		case 3:	// fx
-			activeNode = new FXNode(parentNode);
-			say("New FX created");
-			break;
-		case 4:	// synth
-			activeNode = new SynthNode(parentNode, index);
-			say("New synth created");
-			break;
-		case 5:	// sample
-			activeNode = new SampleNode(parentNode, index);
-			say("New sample created");
-			break;
-		default:	// something's wrong
-			say("ERROR When attempting to add code.");
-			break;
 	}
 }
 
@@ -164,11 +133,21 @@ Mousetrap.bind(['plus', '+'], function() {
 	} else {
 		mode = mode == 'add' ? null : 'add';
 		if (mode == 'add') {
-			if (activeNode.parent.name.substr(0, 4) == 'loop') {
-				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
-			} else {
-				codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
-			}
+				var ancestor = activeNode.parent;
+				if (ancestor.name == 'root') {
+					inLoop = false;
+					codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+				}
+				while (ancestor.name !== 'root') {
+					if (ancestor.name.substr(0,4) == 'loop'){
+						inLoop = true;
+						codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+					} else {
+						inLoop = false;
+						codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+					}		
+					ancestor = ancestor.parent;
+				}
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else {
@@ -182,7 +161,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode.name == 'fx name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -319,7 +298,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 	var response = '';
 	switch (mode) {
 		case 'add': // add code
-			if (activeNode.parent.name.substr(0, 4) == 'loop') {
+			if (inLoop) {
 				switch (selectedCodeType) {
 					case 0: // play
 						response += "New note added after " + activeNode.readName() + '. ';

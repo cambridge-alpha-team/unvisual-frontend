@@ -95,14 +95,6 @@ ValueNode.prototype.generateHTML = function() {
 		sonicPi += (
             "define :tempo do\n" +
             indent("return " + this.getValueHTML() + "\n") +
-            "end\n" +
-            "\n" +
-            "live_loop :beat do\n" +
-            indent("with_bpm tempo do\n" +
-                indent(
-                    "sleep 1\n"
-                ) +
-            "end\n") +
             "end"
         );
 	} else {
