@@ -463,7 +463,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
 						+ " of " + codeTypes.length);
 			} else {
-				say("You are at the bottom of the list");
+				say("You are at the bottom of the list. " + codeTypes[selectedCodeType]);
 			}
 			break;
 		case 'bind-cubelet': // select cubelet
@@ -491,7 +491,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 					activeNode.choice = activeNode.choices[selectedChoice];
 					say(activeNode.choices[selectedChoice]);
 				} else {
-					say("You have reached the bottom of the list of choices.");
+					say("You have reached the bottom of the list of choices. " + activeNode.choice);
 
 				}
 			} else {
@@ -509,9 +509,9 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 					}
 					selectedChoice--;
 					activeNode.choice = activeNode.choices[selectedChoice];
-					say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+					say(activeNode.choices[selectedChoice]);
 				} else {
-					say("You have reached the bottom of the list of choices.");
+					say("You have reached the bottom of the list of choices. " + activeNode.choice);
 				}
 			}
 			break;
@@ -525,9 +525,9 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				say(activeNode.readFull());
 			} else{
 				if (activeNode.parent.name == 'root')
-					say("You are at the bottom of the page.");
+					say("You are at the bottom of the page. " + activeNode.readFull());
 				else
-					say("You can only go up, in or out from this point.");
+					say("You can only go up, in or out from this point. " + activeNode.readFull());
 			}
 			break;
 	}
@@ -544,7 +544,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
 						+ " of " + codeTypes.length);
 			} else {
-				say("You are at the top of the list.");
+				say("You are at the top of the list. " + codeTypes[selectedCodeType]);
 			}
 			break;
 		case 'bind-cubelet': // select cubelet
@@ -572,7 +572,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 					activeNode.choice = activeNode.choices[selectedChoice];
 					say(activeNode.choices[selectedChoice]);
 				} else {
-					say("You have reached the top of the list of choices.");
+					say("You have reached the top of the list of choices. " + activeNode.choice);
 				}
 			} else {
 				if((selectedChoice + 1) < activeNode.choices.length) {
@@ -591,7 +591,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 					activeNode.choice = activeNode.choices[selectedChoice];
 					say(activeNode.choices[selectedChoice]);
 				} else {
-					say("You have reached the top of the list of choices.");
+					say("You have reached the top of the list of choices. " + activeNode.choice);
 				}
 			}	
 			break;
@@ -605,9 +605,9 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				say(activeNode.readFull());
 			} else {
 				if (activeNode.parent.name == 'root')
-					say("You are at the top of the page.");
+					say("You are at the top of the page. " + activeNode.readFull());
 				else 
-					say("You can only go down, in or out  from this point.");
+					say("You can only go down, in or out  from this point. " + activeNode.readFull());
 			}
 			break;
 	}
