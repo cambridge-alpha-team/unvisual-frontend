@@ -98,10 +98,10 @@ function modValue(currentNode, currentChoice, delta) {
 		currentChoice += delta;
 		selectedChoice = currentChoice;
 		currentNode.choice = currentNode.choices[selectedChoice];
-		say(currentNode.name + " set to " + currentNode.choices[selectedChoice]);
+		say(currentNode.choices[selectedChoice]);
 		return true;
 	} else {
-		say("You have reached the bottom of the list of choices.");
+		say("You have reached the bottom of the list of choices. " + currentNode.choice);
 		return false;
 	}
 }
