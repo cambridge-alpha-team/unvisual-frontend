@@ -193,7 +193,7 @@ Mousetrap.bind(['minus', '-'], function() {
 					activeNode = activeNode.parent.children[index];
 				}
 			}
-			say("Code deleted. The currently selected bit of code is " + activeNode.readFull());
+			say("Code deleted. Press control+Z to undo. The currently selected bit of code is " + activeNode.readFull());
 			mode = null;
 		} 
 		regenerate();
@@ -299,8 +299,7 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			say("Cubelet set to " + activeNode.cubelet + ". The currently selected bit of code is " + activeNode.readFull());
 			break;
 		case 'delete': // delete
-			mode = null;
-			say("Delete cancelled. The currently selected bit of code is " + activeNode.readFull());
+			// Do nothing
 			break;
 		case 'choose-value': // choices
 			say("Go out.   " + activeNode.readFull());
