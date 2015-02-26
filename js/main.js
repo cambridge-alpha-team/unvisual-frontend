@@ -1,12 +1,14 @@
 var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
+var addFromLoopChoices = ["after the loop", "at the start of the loop"];
 
 var loopNumber = 1; // to uniquely name loops
 
 var root = new RootNode();
 var activeNode = new TempoNode();
 
-var mode = null; // null | 'add' | 'bind-cubelet' | 'delete' | 'choose-value'
+var mode = null; // null | 'add' | 'bind-cubelet' | 'delete' | 'choose-value' | 'add-loop'
 var selectedCodeType;
+var selectedCodePosition = 0;
 var selectedCubelet;
 var selectedChoice;
 var loopNumber = 1; //to uniquely name loops
@@ -113,8 +115,10 @@ function deleteNode(currentNode) {
 		currentNode.parent.children.splice(index, 1);
 		if(index > 0) {
 			activeNode = currentNode.parent.children[index - 1];
-		} else {
+		} else if (currentNode.parent.children.length > 0) {
 			activeNode = currentNode.parent.children[index];
+		} else {
+			activeNode = currentNode.parent;
 		}
 		say("Code deleted. The currently selected bit of code is " + activeNode.readFull());
 		return true;
@@ -162,15 +166,14 @@ Mousetrap.bind(['plus', '+'], function() {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
-		mode = mode == 'add' ? null : 'add';
+		mode = (mode == 'add' || mode == 'add-loop') ? null : activeNode.name.substr(0, 4) == 'loop' ? 'add-loop' : 'add';
+		codeTypes = activeNode.parent.name.substr(0, 4) == 'loop' ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
 		if (mode == 'add') {
-			if (activeNode.parent.name.substr(0, 4) == 'loop') {
-				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
-			} else {
-				codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
-			}
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
+		} else if (mode == 'add-loop') {
+			selectedCodePosition = 0;
+			say("Where do you want to add the code? " + addFromLoopChoices[selectedCodePosition] + "; " + (selectedCodePosition + 1) + " of " + addFromLoopChoices.length);
 		} else {
 			say("Adding code cancelled. " + activeNode.readName());
 		}
@@ -182,7 +185,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx' && activeNode.parent.name.substring(0, 4) != 'loop') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -302,6 +305,10 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 			say("Go out.   " + activeNode.readFull());
 			mode = null;
 			break;
+		case 'add-loop': // choose where to add code relative to a loop
+			mode = null;
+			say("Adding code cancelled. The currently selected bit of code is " + activeNode.readFull());
+			break;
 		default:
 			if (activeNode.parent != root) {
 				activeNode = activeNode.parent;
@@ -319,17 +326,21 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 	var response = '';
 	switch (mode) {
 		case 'add': // add code
+			var newNodeMsg = selectedCodePosition == 1 ? "at the start of " : "after ";
+			var newNodeParent = selectedCodePosition == 1 ? activeNode : activeNode.parent;
+			var newNodeIndex = selectedCodePosition == 1 ? 0 : (activeNode.parent.children.indexOf(activeNode) + 1);
 			if (activeNode.parent.name.substr(0, 4) == 'loop') {
 				switch (selectedCodeType) {
 					case 0: // play
-						response += "New note added after " + activeNode.readName() + '. ';
-						activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New note added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new PlayNode(newNodeParent, newNodeIndex);
 						break;
 					case 1: // sleep
-						response += "New rest added after " + activeNode.readName() + '. ';
-						activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New rest added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new SleepNode(newNodeParent, newNodeIndex);
 						break;
 					case 2: // fx
+						// This shouldn't behave any differently depending on the value of selectedCodePosition.
 						response += "New FX added around " ;
 						for (var i = 0; i < activeNode.parent.children.length; i++){
 							response += activeNode.parent.children[i].readName();
@@ -344,12 +355,12 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new FXNode(activeNode.parent);
 						break;
 					case 3: // synth
-						response += "New synth added after " + activeNode.readName() + '. ';
-						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New synth added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new SynthNode(newNodeParent, newNodeIndex);
 						break;
 					case 4: // sample
-						response += "New sample added after " + activeNode.readName() + '. ';
-						activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new SampleNode(newNodeParent, newNodeIndex);
 						break;
 					default: // something's wrong
 						say("ERROR When attempting to add code.");
@@ -358,18 +369,19 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			} else {
 				switch (selectedCodeType) {
 					case 0: // loop
-						response += "New loop added after " + activeNode.readName() + '. ';
-						activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New loop added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new LoopNode("loop" + loopNumber++, newNodeParent, newNodeIndex);
 						break;
 					case 1: // play
-						response += "New note added after " + activeNode.readName() + '. ';
-						activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New note added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new PlayNode(newNodeParent, newNodeIndex);
 						break;
 					case 2: // sleep
-						response += "New rest added after " + activeNode.readName() + '. ';
-						activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New rest added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new SleepNode(newNodeParent, newNodeIndex);
 						break;
 					case 3: // fx
+						// This shouldn't behave any differently depending on the value of selectedCodePosition.
 						response += "New FX added around " ;
 						for (var i = 0; i < activeNode.parent.children.length; i++){
 							response += activeNode.parent.children[i].readName();
@@ -384,12 +396,12 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new FXNode(activeNode.parent);
 						break;
 					case 4: // synth
-						response += "New synth added after " + activeNode.readName() + '. ';
-						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New synth added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new SynthNode(newNodeParent, newNodeIndex);
 						break;
 					case 5: // sample
-						response += "New sample added after " + activeNode.readName() + '. ';
-						activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
+						activeNode = new SampleNode(newNodeParent, newNodeIndex);
 						break;
 					default: // something's wrong
 						say("ERROR When attempting to add code.");
@@ -434,14 +446,22 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				activeNode.parent.children.splice(index, 1);
 				if (index > 0) {
 					activeNode = activeNode.parent.children[index - 1];
-				} else {
+				} else if (activeNode.parent.children.length > 0) {
 					activeNode = activeNode.parent.children[index];
+				} else {
+					activeNode = activeNode.parent;
 				}
 			}
+			say("Code deleted. The currently selected bit of code is " + activeNode.readFull());
 			mode = null;
 			break;
 		case 'choose-value': //choices
 			//Do nothing 
+			break;
+		case 'add-loop': // choose where to add code relative to a loop
+			selectedCodeType = 0;
+			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
+			mode = 'add';
 			break;
 		default:
 			if (activeNode.children.length > 0) {
@@ -484,7 +504,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
 						+ " of " + codeTypes.length);
 			} else {
-				say("You are at the bottom of the list");
+				say("You are at the bottom of the list.");
 			}
 			break;
 		case 'bind-cubelet': // select cubelet
@@ -516,6 +536,15 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 			break;
 		case 'delete': // delete
 			// do nothing
+			break;
+		case 'add-loop': // choose where to add code relative to a loop
+			if (selectedCodePosition < (addFromLoopChoices.length - 1)) {
+				selectedCodePosition++;
+				say(addFromLoopChoices[selectedCodePosition] + "; " + (selectedCodePosition + 1)
+						+ " of " + addFromLoopChoices.length);
+			} else {
+				say("You are at the bottom of the list.");
+			}
 			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
@@ -575,6 +604,15 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 			break;
 		case 'delete': // delete
 			// do nothing
+			break;
+		case 'add-loop': // choose where to add code relative to a loop
+			if (selectedCodePosition > 0) {
+				selectedCodePosition--;
+				say(addFromLoopChoices[selectedCodePosition] + "; " + (selectedCodePosition + 1)
+						+ " of " + addFromLoopChoices.length);
+			} else {
+				say("You are at the top of the list.");
+			}
 			break;
 		default:
 			var n = activeNode.parent.children.indexOf(activeNode);
