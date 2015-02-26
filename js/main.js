@@ -1,6 +1,8 @@
 var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
 var addFromLoopChoices = ["after the loop", "at the start of the loop"];
 
+var inLoop = false;
+
 var loopNumber = 1; // to uniquely name loops
 
 var root = new RootNode();
@@ -58,38 +60,6 @@ function addChildNode(childNode, parentNode, index) {
 	}
 }
 
-function addNode(currentNode, parentNode, index, codeType) {
-	switch(codeType) {
-		case 0:	// loop
-			activeNode = new LoopNode("loop" + loopNumber++, parentNode, index);
-			say("New loop created");
-			break;
-		case 1:	// play
-			activeNode = new PlayNode(parentNode, index);
-			say("New note created");
-			break;
-		case 2:	// sleep
-			activeNode = new SleepNode(parentNode, index);
-			say("New rest created");
-			break;
-		case 3:	// fx
-			activeNode = new FXNode(parentNode);
-			say("New FX created");
-			break;
-		case 4:	// synth
-			activeNode = new SynthNode(parentNode, index);
-			say("New synth created");
-			break;
-		case 5:	// sample
-			activeNode = new SampleNode(parentNode, index);
-			say("New sample created");
-			break;
-		default:	// something's wrong
-			say("ERROR When attempting to add code.");
-			break;
-	}
-}
-
 function bindCubelet(currentNode, cubelet) {
 	currentNode.cubelet = cubelet;
 	if (cubelet > 0) {
@@ -133,10 +103,10 @@ function modValue(currentNode, currentChoice, delta) {
 		currentChoice += delta;
 		selectedChoice = currentChoice;
 		currentNode.choice = currentNode.choices[selectedChoice];
-		say(currentNode.name + " set to " + currentNode.choices[selectedChoice]);
+		say(currentNode.choices[selectedChoice]);
 		return true;
 	} else {
-		say("You have reached the bottom of the list of choices.");
+		say("You have reached the bottom of the list of choices. " + currentNode.choice);
 		return false;
 	}
 }
@@ -169,6 +139,20 @@ Mousetrap.bind(['plus', '+'], function() {
 		mode = (mode == 'add' || mode == 'add-loop') ? null : activeNode.name.substr(0, 4) == 'loop' ? 'add-loop' : 'add';
 		codeTypes = activeNode.parent.name.substr(0, 4) == 'loop' ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
 		if (mode == 'add') {
+				var ancestor = activeNode.parent;
+				if (ancestor instanceof RootNode) {
+					codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
+				}
+				while (!(ancestor instanceof RootNode)) {
+					if (ancestor instanceof LoopNode){
+						inLoop = true;
+						codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+					} else {
+						inLoop = false;
+						codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+					}		
+					ancestor = ancestor.parent;
+				}
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else if (mode == 'add-loop') {
@@ -325,11 +309,74 @@ Mousetrap.bind(['left', 'a', 'h'], function() {
 Mousetrap.bind(['right', 'd', 'l'], function() {
 	var response = '';
 	switch (mode) {
-		case 'add': // add code
+		case 'add': // add code			
 			var newNodeMsg = selectedCodePosition == 1 ? "at the start of " : "after ";
 			var newNodeParent = selectedCodePosition == 1 ? activeNode : activeNode.parent;
 			var newNodeIndex = selectedCodePosition == 1 ? 0 : (activeNode.parent.children.indexOf(activeNode) + 1);
 			if (activeNode.parent.name.substr(0, 4) == 'loop' || (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop')) {
+				switch (selectedCodeType) {
+				case 0: // play
+					response += "New note added " + newNodeMsg + activeNode.readName() + '. ';
+					activeNode = new PlayNode(newNodeParent, newNodeIndex);
+					break;
+				case 1: // sleep
+					response += "New rest added " + newNodeMsg + activeNode.readName() + '. ';
+					activeNode = new SleepNode(newNodeParent, newNodeIndex);
+					break;
+				case 2: // fx
+					// This shouldn't behave any differently depending on the value of selectedCodePosition.
+					response += "New FX added around " ;
+					for (var i = 0; i < activeNode.parent.children.length; i++){
+						response += activeNode.parent.children[i].readName();
+						if ( i == (activeNode.parent.children.length - 2))
+							response += " and ";
+						else if ( i == (activeNode.parent.children.length - 1))
+							response += ". ";
+						else 
+							response += ", ";
+					}
+					
+					activeNode = new FXNode(activeNode.parent);
+					break;
+				case 3: // synth
+					response += "New synth added " + newNodeMsg + activeNode.readName() + '. ';
+					activeNode = new SynthNode(newNodeParent, newNodeIndex);
+					break;
+				case 4: // sample
+					response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
+					activeNode = new SampleNode(newNodeParent, newNodeIndex);
+					break;
+				default: // something's wrong
+					say("ERROR When attempting to add code.");
+					break;
+				} 
+			} else if (activeNode.parent instanceof RootNode) {
+				switch (selectedCodeType) {
+					case 0: // loop
+						response += "New loop added after " + activeNode.readName() + '. ';
+						activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 1: // play
+						response += "New note added after " + activeNode.readName() + '. ';
+						activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 2: // sleep
+						response += "New rest added after " + activeNode.readName() + '. ';
+						activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 3: // synth
+						response += "New synth added after " + activeNode.readName() + '. ';
+						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 4: // sample
+						response += "New sample added after " + activeNode.readName() + '. ';
+						activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					default: // something's wrong
+						say("ERROR When attempting to add code.");
+						break;
+				}
+			} else if (inLoop) {
 				switch (selectedCodeType) {
 					case 0: // play
 						response += "New note added " + newNodeMsg + activeNode.readName() + '. ';
@@ -461,7 +508,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			break;
 		case 'add-loop': // choose where to add code relative to a loop
 			selectedCodeType = 0;
-			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') {
+				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+			} else {
+				codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
+			}
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			mode = 'add';
 			break;
@@ -506,7 +557,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
 						+ " of " + codeTypes.length);
 			} else {
-				say("You are at the bottom of the list.");
+				say("You are at the bottom of the list. " + codeTypes[selectedCodeType]);
 			}
 			break;
 		case 'bind-cubelet': // select cubelet
@@ -517,23 +568,45 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if(0 < selectedChoice) {
-				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
-					actionRefs[actionIndex][2] = selectedChoice - 1;
-				} else if (actions.length > 0) {
-					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
-					actionIndex++;
+			if (activeNode.name == 'sample') {
+				if ((selectedChoice + 1) < activeNode.choices.length) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice + 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					}
+					selectedChoice++;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
 				} else {
-					actions.push(mode);
-					actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
-					actionIndex++;
+					say("You have reached the bottom of the list of choices. " + activeNode.choice);
+
 				}
-				selectedChoice--;
-				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
 			} else {
-				say("You have reached the bottom of the list of choices.");
+				if(0 < selectedChoice) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice - 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					}
+					selectedChoice--;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
+				} else {
+					say("You have reached the bottom of the list of choices. " + activeNode.choice);
+				}
 			}
 			break;
 		case 'delete': // delete
@@ -555,9 +628,9 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				say(activeNode.readFull());
 			} else{
 				if (activeNode.parent.name == 'root')
-					say("You are at the bottom of the page.");
+					say("You are at the bottom of the page. " + activeNode.readFull());
 				else
-					say("You can only go up, in or out from this point.");
+					say("You can only go up, in or out from this point. " + activeNode.readFull());
 			}
 			break;
 	}
@@ -574,7 +647,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
 						+ " of " + codeTypes.length);
 			} else {
-				say("You are at the top of the list.");
+				say("You are at the top of the list. " + codeTypes[selectedCodeType]);
 			}
 			break;
 		case 'bind-cubelet': // select cubelet
@@ -585,24 +658,45 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if((selectedChoice + 1) < activeNode.choices.length) {
-				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
-					actionRefs[actionIndex][2] = selectedChoice + 1;
-				} else if (actions.length > 0) {
-					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
-					actionIndex++;
+			if (activeNode.name == 'sample') {
+				if (0 < selectedChoice) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice - 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					}
+					selectedChoice--;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
 				} else {
-					actions.push(mode);
-					actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
-					actionIndex++;
+					say("You have reached the top of the list of choices. " + activeNode.choice);
 				}
-				selectedChoice++;
-				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
 			} else {
-				say("You have reached the top of the list of choices.");
-			}
+				if((selectedChoice + 1) < activeNode.choices.length) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice + 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					}
+					selectedChoice++;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
+				} else {
+					say("You have reached the top of the list of choices. " + activeNode.choice);
+				}
+			}	
 			break;
 		case 'delete': // delete
 			// do nothing
@@ -623,9 +717,9 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				say(activeNode.readFull());
 			} else {
 				if (activeNode.parent.name == 'root')
-					say("You are at the top of the page.");
+					say("You are at the top of the page. " + activeNode.readFull());
 				else 
-					say("You can only go down, in or out  from this point.");
+					say("You can only go down, in or out  from this point. " + activeNode.readFull());
 			}
 			break;
 	}
