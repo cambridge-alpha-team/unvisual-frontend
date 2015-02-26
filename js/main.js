@@ -417,6 +417,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			}
 			actionIndex++;
 			say(response + activeNode.readFull());
+			selectedCodePosition = 0;
 			mode = null;
 			break;
 		case 'bind-cubelet': // select cubelet
