@@ -1,4 +1,4 @@
-var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
+var codeTypes = ["loop", "play", "play chord", "sleep", "fx", "synth", "sample"];
 var inLoop = false;
 
 var loopNumber = 1; // to uniquely name loops
@@ -135,15 +135,15 @@ Mousetrap.bind(['plus', '+'], function() {
 		if (mode == 'add') {
 				var ancestor = activeNode.parent;
 				if (ancestor instanceof RootNode) {
-					codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
+					codeTypes = [ "loop", "play", "play chord",  "sleep", "synth", "sample" ];
 				}
 				while (!(ancestor instanceof RootNode)) {
 					if (ancestor instanceof LoopNode){
 						inLoop = true;
-						codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+						codeTypes = [ "play", "play chord", "sleep", "fx", "synth", "sample" ];
 					} else {
 						inLoop = false;
-						codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+						codeTypes = [ "loop", "play", "play chord", "sleep", "fx", "synth", "sample" ];
 					}		
 					ancestor = ancestor.parent;
 				}
@@ -307,15 +307,19 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					response += "New note added after " + activeNode.readName() + '. ';
 					activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 					break;
-				case 2: // sleep
+				case 2: // play chord
+					response += "New chord added after " + activeNode.readName() + '. ';
+					activeNode = new ChordNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+					break;
+				case 3: // sleep
 					response += "New rest added after " + activeNode.readName() + '. ';
 					activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 					break;
-				case 3: // synth
+				case 4: // synth
 					response += "New synth added after " + activeNode.readName() + '. ';
 					activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 					break;
-				case 4: // sample
+				case 5: // sample
 					response += "New sample added after " + activeNode.readName() + '. ';
 					activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 					break;
@@ -329,11 +333,15 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						response += "New note added after " + activeNode.readName() + '. ';
 						activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
-					case 1: // sleep
+					case 1: // play chord
+						response += "New chord added after " + activeNode.readName() + '. ';
+						activeNode = new ChordNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 2: // sleep
 						response += "New rest added after " + activeNode.readName() + '. ';
 						activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
-					case 2: // fx
+					case 3: // fx
 						response += "New FX added around " ;
 						for (var i = 0; i < activeNode.parent.children.length; i++){
 							response += activeNode.parent.children[i].readName();
@@ -344,14 +352,13 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 							else 
 								response += ", ";
 						}
-						
 						activeNode = new FXNode(activeNode.parent);
 						break;
-					case 3: // synth
+					case 4: // synth
 						response += "New synth added after " + activeNode.readName() + '. ';
 						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
-					case 4: // sample
+					case 5: // sample
 						response += "New sample added after " + activeNode.readName() + '. ';
 						activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
@@ -369,11 +376,15 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						response += "New note added after " + activeNode.readName() + '. ';
 						activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
-					case 2: // sleep
+					case 2: // play chord
+						response += "New chord added after " + activeNode.readName() + '. ';
+						activeNode = new ChordNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+						break;
+					case 3: // sleep
 						response += "New rest added after " + activeNode.readName() + '. ';
 						activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
-					case 3: // fx
+					case 4: // fx
 						response += "New FX added around " ;
 						for (var i = 0; i < activeNode.parent.children.length; i++){
 							response += activeNode.parent.children[i].readName();
@@ -387,11 +398,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						
 						activeNode = new FXNode(activeNode.parent);
 						break;
-					case 4: // synth
+					case 5: // synth
 						response += "New synth added after " + activeNode.readName() + '. ';
 						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
-					case 5: // sample
+					case 6: // sample
 						response += "New sample added after " + activeNode.readName() + '. ';
 						activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
