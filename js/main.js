@@ -474,23 +474,45 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if(0 < selectedChoice) {
-				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
-					actionRefs[actionIndex][2] = selectedChoice - 1;
-				} else if (actions.length > 0) {
-					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
-					actionIndex++;
+			if (activeNode.name == 'sample') {
+				if ((selectedChoice + 1) < activeNode.choices.length) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice + 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					}
+					selectedChoice++;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
 				} else {
-					actions.push(mode);
-					actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
-					actionIndex++;
+					say("You have reached the bottom of the list of choices.");
+
 				}
-				selectedChoice--;
-				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.choices[selectedChoice]);
 			} else {
-				say("You have reached the bottom of the list of choices.");
+				if(0 < selectedChoice) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice - 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					}
+					selectedChoice--;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
+				} else {
+					say("You have reached the bottom of the list of choices.");
+				}
 			}
 			break;
 		case 'delete': // delete
@@ -533,24 +555,45 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if((selectedChoice + 1) < activeNode.choices.length) {
-				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
-					actionRefs[actionIndex][2] = selectedChoice + 1;
-				} else if (actions.length > 0) {
-					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
-					actionIndex++;
+			if (activeNode.name == 'sample') {
+				if (0 < selectedChoice) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice - 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					}
+					selectedChoice--;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
 				} else {
-					actions.push(mode);
-					actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
-					actionIndex++;
+					say("You have reached the top of the list of choices.");
 				}
-				selectedChoice++;
-				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.choices[selectedChoice]);
 			} else {
-				say("You have reached the top of the list of choices.");
-			}
+				if((selectedChoice + 1) < activeNode.choices.length) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice + 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					}
+					selectedChoice++;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
+				} else {
+					say("You have reached the top of the list of choices.");
+				}
+			}	
 			break;
 		case 'delete': // delete
 			// do nothing
