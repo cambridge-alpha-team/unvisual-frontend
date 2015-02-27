@@ -139,12 +139,11 @@ Mousetrap.bind(['plus', '+'], function() {
 		codeTypes = activeNode.parent.name.substr(0, 4) == 'loop' ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
 		if (mode == 'add') {
 			var ancestor = activeNode.parent;
-			if (ancestor.name == 'root') {
-				inLoop = false;
-				codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+			if (ancestor instanceof RootNode) {
+				codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
 			}
-			while (ancestor.name !== 'root') {
-				if (ancestor.name.substr(0,4) == 'loop'){
+			while (!(ancestor instanceof RootNode)) {
+				if (ancestor instanceof LoopNode){
 					inLoop = true;
 					codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
 				} else {
@@ -445,7 +444,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			break;
 		case 'add-loop': // choose where to add code relative to a loop
 			selectedCodeType = 0;
-			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') {
+				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+			} else {
+				codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
+			}
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			mode = 'add';
 			break;
