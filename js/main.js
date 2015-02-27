@@ -1,5 +1,6 @@
 var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
 var addFromLoopChoices = ["after the loop", "at the start of the loop"];
+var inLoop = false;
 
 var loopNumber = 1; // to uniquely name loops
 
@@ -58,38 +59,6 @@ function addChildNode(childNode, parentNode, index) {
 	}
 }
 
-function addNode(currentNode, parentNode, index, codeType) {
-	switch(codeType) {
-		case 0:	// loop
-			activeNode = new LoopNode("loop" + loopNumber++, parentNode, index);
-			say("New loop created");
-			break;
-		case 1:	// play
-			activeNode = new PlayNode(parentNode, index);
-			say("New note created");
-			break;
-		case 2:	// sleep
-			activeNode = new SleepNode(parentNode, index);
-			say("New rest created");
-			break;
-		case 3:	// fx
-			activeNode = new FXNode(parentNode);
-			say("New FX created");
-			break;
-		case 4:	// synth
-			activeNode = new SynthNode(parentNode, index);
-			say("New synth created");
-			break;
-		case 5:	// sample
-			activeNode = new SampleNode(parentNode, index);
-			say("New sample created");
-			break;
-		default:	// something's wrong
-			say("ERROR When attempting to add code.");
-			break;
-	}
-}
-
 function bindCubelet(currentNode, cubelet) {
 	currentNode.cubelet = cubelet;
 	if (cubelet > 0) {
@@ -133,10 +102,10 @@ function modValue(currentNode, currentChoice, delta) {
 		currentChoice += delta;
 		selectedChoice = currentChoice;
 		currentNode.choice = currentNode.choices[selectedChoice];
-		say(currentNode.name + " set to " + currentNode.choices[selectedChoice]);
+		say(currentNode.choices[selectedChoice]);
 		return true;
 	} else {
-		say("You have reached the bottom of the list of choices.");
+		say("You have reached the bottom of the list of choices. " + currentNode.choice);
 		return false;
 	}
 }
@@ -169,6 +138,21 @@ Mousetrap.bind(['plus', '+'], function() {
 		mode = (mode == 'add' || mode == 'add-loop') ? null : activeNode.name.substr(0, 4) == 'loop' ? 'add-loop' : 'add';
 		codeTypes = activeNode.parent.name.substr(0, 4) == 'loop' ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
 		if (mode == 'add') {
+			var ancestor = activeNode.parent;
+			if (ancestor.name == 'root') {
+				inLoop = false;
+				codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+			}
+			while (ancestor.name !== 'root') {
+				if (ancestor.name.substr(0,4) == 'loop'){
+					inLoop = true;
+					codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+				} else {
+					inLoop = false;
+					codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+				}		
+				ancestor = ancestor.parent;
+			}
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else if (mode == 'add-loop') {
@@ -185,7 +169,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx' && activeNode.parent.name.substr(0, 4) != 'loop') || activeNode instanceof ChoiceNode || activeNode.parent instanceof PlayNode) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode.name == 'fx name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -329,7 +313,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			var newNodeMsg = selectedCodePosition == 1 ? "at the start of " : "after ";
 			var newNodeParent = selectedCodePosition == 1 ? activeNode : activeNode.parent;
 			var newNodeIndex = selectedCodePosition == 1 ? 0 : (activeNode.parent.children.indexOf(activeNode) + 1);
-			if (activeNode.parent.name.substr(0, 4) == 'loop' || (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop')) {
+			if (inLoop) {
 				switch (selectedCodeType) {
 					case 0: // play
 						response += "New note added " + newNodeMsg + activeNode.readName() + '. ';
@@ -506,7 +490,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
 						+ " of " + codeTypes.length);
 			} else {
-				say("You are at the bottom of the list.");
+				say("You are at the bottom of the list. " + codeTypes[selectedCodeType]);
 			}
 			break;
 		case 'bind-cubelet': // select cubelet
@@ -517,23 +501,45 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if(0 < selectedChoice) {
-				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
-					actionRefs[actionIndex][2] = selectedChoice - 1;
-				} else if (actions.length > 0) {
-					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
-					actionIndex++;
+			if (activeNode.name == 'sample') {
+				if ((selectedChoice + 1) < activeNode.choices.length) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice + 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					}
+					selectedChoice++;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
 				} else {
-					actions.push(mode);
-					actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
-					actionIndex++;
+					say("You have reached the bottom of the list of choices. " + activeNode.choice);
+
 				}
-				selectedChoice--;
-				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
 			} else {
-				say("You have reached the bottom of the list of choices.");
+				if(0 < selectedChoice) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice - 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					}
+					selectedChoice--;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
+				} else {
+					say("You have reached the bottom of the list of choices. " + activeNode.choice);
+				}
 			}
 			break;
 		case 'delete': // delete
@@ -555,9 +561,9 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				say(activeNode.readFull());
 			} else{
 				if (activeNode.parent.name == 'root')
-					say("You are at the bottom of the page.");
+					say("You are at the bottom of the page. " + activeNode.readFull());
 				else
-					say("You can only go up, in or out from this point.");
+					say("You can only go up, in or out from this point. " + activeNode.readFull());
 			}
 			break;
 	}
@@ -574,7 +580,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				say(codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1)
 						+ " of " + codeTypes.length);
 			} else {
-				say("You are at the top of the list.");
+				say("You are at the top of the list. " + codeTypes[selectedCodeType]);
 			}
 			break;
 		case 'bind-cubelet': // select cubelet
@@ -585,24 +591,45 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if((selectedChoice + 1) < activeNode.choices.length) {
-				if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
-					actionRefs[actionIndex][2] = selectedChoice + 1;
-				} else if (actions.length > 0) {
-					actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
-					actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
-					actionIndex++;
+			if (activeNode.name == 'sample') {
+				if (0 < selectedChoice) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice - 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice - 1]);
+						actionIndex++;
+					}
+					selectedChoice--;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
 				} else {
-					actions.push(mode);
-					actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
-					actionIndex++;
+					say("You have reached the top of the list of choices. " + activeNode.choice);
 				}
-				selectedChoice++;
-				activeNode.choice = activeNode.choices[selectedChoice];
-				say(activeNode.name + " set to " + activeNode.choices[selectedChoice]);
 			} else {
-				say("You have reached the top of the list of choices.");
-			}
+				if((selectedChoice + 1) < activeNode.choices.length) {
+					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
+						actionRefs[actionIndex][2] = selectedChoice + 1;
+					} else if (actions.length > 0) {
+						actions.splice(actionIndex + 1, actions.length - actionIndex, mode);
+						actionRefs.splice(actionIndex + 1, actionRefs.length - actionIndex, [activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					} else {
+						actions.push(mode);
+						actionRefs.push([activeNode, selectedChoice, selectedChoice + 1]);
+						actionIndex++;
+					}
+					selectedChoice++;
+					activeNode.choice = activeNode.choices[selectedChoice];
+					say(activeNode.choices[selectedChoice]);
+				} else {
+					say("You have reached the top of the list of choices. " + activeNode.choice);
+				}
+			}	
 			break;
 		case 'delete': // delete
 			// do nothing
@@ -623,9 +650,9 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				say(activeNode.readFull());
 			} else {
 				if (activeNode.parent.name == 'root')
-					say("You are at the top of the page.");
+					say("You are at the top of the page. " + activeNode.readFull());
 				else 
-					say("You can only go down, in or out  from this point.");
+					say("You can only go down, in or out  from this point. " + activeNode.readFull());
 			}
 			break;
 	}
