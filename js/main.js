@@ -323,19 +323,18 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new SleepNode(newNodeParent, newNodeIndex);
 						break;
 					case 2: // fx
-						// This shouldn't behave any differently depending on the value of selectedCodePosition.
 						response += "New FX added around " ;
-						for (var i = 0; i < activeNode.parent.children.length; i++){
-							response += activeNode.parent.children[i].readName();
-							if ( i == (activeNode.parent.children.length - 2))
+						for (var i = 0; i < newNodeParent.children.length; i++){
+							response += newNodeParent.children[i].readName();
+							if ( i == (newNodeParent.children.length - 2))
 								response += " and ";
-							else if ( i == (activeNode.parent.children.length - 1))
+							else if ( i == (newNodeParent.children.length - 1))
 								response += ". ";
 							else 
 								response += ", ";
 						}
 						
-						activeNode = new FXNode(activeNode.parent);
+						activeNode = new FXNode(newNodeParent);
 						break;
 					case 3: // synth
 						response += "New synth added " + newNodeMsg + activeNode.readName() + '. ';
@@ -364,19 +363,18 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new SleepNode(newNodeParent, newNodeIndex);
 						break;
 					case 3: // fx
-						// This shouldn't behave any differently depending on the value of selectedCodePosition.
 						response += "New FX added around " ;
-						for (var i = 0; i < activeNode.parent.children.length; i++){
-							response += activeNode.parent.children[i].readName();
-							if ( i == (activeNode.parent.children.length - 2))
+						for (var i = 0; i < newNodeParent.children.length; i++){
+							response += newNodeParent.children[i].readName();
+							if ( i == (newNodeParent.children.length - 2))
 								response += " and ";
-							else if ( i == (activeNode.parent.children.length - 1))
+							else if ( i == (newNodeParent.children.length - 1))
 								response += ". ";
 							else 
 								response += ", ";
 						}
 						
-						activeNode = new FXNode(activeNode.parent);
+						activeNode = new FXNode(newNodeParent);
 						break;
 					case 4: // synth
 						response += "New synth added " + newNodeMsg + activeNode.readName() + '. ';
@@ -445,8 +443,10 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 		case 'add-loop': // choose where to add code relative to a loop
 			selectedCodeType = 0;
 			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') {
+				inLoop = true;
 				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
 			} else {
+				inLoop = false;
 				codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
 			}
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
