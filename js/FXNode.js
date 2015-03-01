@@ -1,5 +1,5 @@
 function FXNode(parent) {
-	this.name = "fx";
+	this.name = "effect";
 	this.parent = parent || null;
 	this.children = [];
 	if (parent instanceof FXNode) {
@@ -16,7 +16,7 @@ function FXNode(parent) {
 		}
 	}
 	this.children.reverse();
-	new ChoiceNode('fx name', this, ['echo', 'distortion', 'wobble']);
+	new ChoiceNode('effect name', this, ['echo', 'distortion', 'wobble']);
 }
 inherits(FXNode, Node);
 
