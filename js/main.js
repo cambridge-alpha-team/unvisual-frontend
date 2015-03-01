@@ -1,4 +1,4 @@
-var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
+var codeTypes = ["loop", "play", "sleep", "effect", "change sound", "sample"];
 var addFromLoopChoices = ["after the loop", "at the start of the loop"];
 var inLoop = false;
 
@@ -40,7 +40,7 @@ function unparentNode(childNode) {
 }
 
 function addChildNode(childNode, parentNode, index) {
-	if (childNode.name == 'fx') {
+	if (childNode.name == 'effect') {
 		for (var i = 0; i < childNode.children.length; i++) {
 			childNode.children[i].parent = childNode;
 			var childIndex = childNode.parent.children.indexOf(childNode.children[i]);
@@ -72,7 +72,7 @@ function deleteNode(currentNode) {
 	// Determine the index of currentNode in the parent's array of children
 	var index = currentNode.parent.children.indexOf(currentNode);
 	if(index >= 0) {
-		if(currentNode.name == "fx") {
+		if(currentNode.name == "effect") {
 			// Parent currentNode's children to currentNode's parent
 			for(var i = 1; i < currentNode.children.length; i++) {
 				var childNode = currentNode.children[i];
@@ -134,27 +134,27 @@ Mousetrap.bind(['plus', '+'], function() {
 	// These two variables should always begin at their default values when this keyboard shortcut is used.
 	inLoop = false;
 	selectedCodePosition = 0;
-	if (['root', 'fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
+	if (['root', 'effect'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
 		mode = (mode == 'add' || mode == 'add-loop') ? null : activeNode.name.substr(0, 4) == 'loop' ? 'add-loop' : 'add';
 		codeTypes = activeNode.parent.name.substr(0, 4) == 'loop' ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
 		if (mode == 'add') {
-			var ancestor = activeNode.parent;
-			if (ancestor instanceof RootNode) {
-				codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
-			}
-			while (!(ancestor instanceof RootNode)) {
-				if (ancestor instanceof LoopNode){
-					inLoop = true;
-					codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
-				} else {
-					inLoop = false;
-					codeTypes = [ "loop", "play", "sleep", "fx", "synth", "sample" ];
-				}		
-				ancestor = ancestor.parent;
-			}
+				var ancestor = activeNode.parent;
+				if (ancestor instanceof RootNode) {
+					codeTypes = [ "loop", "play", "sleep", "change sound", "sample" ];
+				}
+				while (!(ancestor instanceof RootNode)) {
+					if (ancestor instanceof LoopNode){
+						inLoop = true;
+						codeTypes = [ "play", "sleep", "effect", "change sound", "sample" ];
+					} else {
+						inLoop = false;
+						codeTypes = [ "loop", "play", "sleep", "effect", "change sound", "sample" ];
+					}		
+					ancestor = ancestor.parent;
+				}
 			selectedCodeType = 0;
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 		} else if (mode == 'add-loop') {
@@ -171,7 +171,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'fx') || activeNode.name == 'fx name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'effect') || activeNode.name == 'effect name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -188,7 +188,7 @@ Mousetrap.bind(['minus', '-'], function() {
 			}
 			actionIndex++;
 			if(index >= 0) {
-				if(activeNode.name == "fx") {
+				if(activeNode.name == "effect") {
 					// Parent activeNode's children to activeNode's parent
 					for (var i = 1; i < activeNode.children.length; i++) {
 						var childNode = activeNode.children[i];
@@ -352,11 +352,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						response += "New rest added " + newNodeMsg + activeNode.readName() + '. ';
 						activeNode = new SleepNode(newNodeParent, newNodeIndex);
 						break;
-					case 2: // fx
-						response += "New FX added around " ;
-						for (var i = 0; i < newNodeParent.children.length; i++){
-							response += newNodeParent.children[i].readName();
-							if ( i == (newNodeParent.children.length - 2))
+					case 2: // effect
+						response += "New effect added around " ;
+						for (var i = 0; i < activeNode.parent.children.length; i++){
+							response += activeNode.parent.children[i].readName();
+							if ( i == (activeNode.parent.children.length - 2))
 								response += " and ";
 							else if ( i == (newNodeParent.children.length - 1))
 								response += ". ";
@@ -367,8 +367,8 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new FXNode(newNodeParent);
 						break;
 					case 3: // synth
-						response += "New synth added " + newNodeMsg + activeNode.readName() + '. ';
-						activeNode = new SynthNode(newNodeParent, newNodeIndex);
+						response += "New change sound added after " + activeNode.readName() + '. ';
+						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
 					case 4: // sample
 						response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
@@ -392,11 +392,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						response += "New rest added " + newNodeMsg + activeNode.readName() + '. ';
 						activeNode = new SleepNode(newNodeParent, newNodeIndex);
 						break;
-					case 3: // fx
-						response += "New FX added around " ;
-						for (var i = 0; i < newNodeParent.children.length; i++){
-							response += newNodeParent.children[i].readName();
-							if ( i == (newNodeParent.children.length - 2))
+					case 3: // effect
+						response += "New effect added around " ;
+						for (var i = 0; i < activeNode.parent.children.length; i++){
+							response += activeNode.parent.children[i].readName();
+							if ( i == (activeNode.parent.children.length - 2))
 								response += " and ";
 							else if ( i == (newNodeParent.children.length - 1))
 								response += ". ";
@@ -407,8 +407,8 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new FXNode(newNodeParent);
 						break;
 					case 4: // synth
-						response += "New synth added " + newNodeMsg + activeNode.readName() + '. ';
-						activeNode = new SynthNode(newNodeParent, newNodeIndex);
+						response += "New change sound added after " + activeNode.readName() + '. ';
+						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
 					case 5: // sample
 						response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
@@ -445,10 +445,10 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			selectedCodeType = 0;
 			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') {
 				inLoop = true;
-				codeTypes = [ "play", "sleep", "fx", "synth", "sample" ];
+				codeTypes = [ "play", "sleep", "effect", "change sound", "sample" ];
 			} else {
 				inLoop = false;
-				codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
+				codeTypes = [ "loop", "play", "sleep", "change sound", "sample" ];
 			}
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			mode = 'add';
@@ -464,16 +464,16 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				if (activeNode.name == "sleep") {
 					say("How many beats do you want to sleep for? Choose a value between 0.125 and 4: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "note") {
-					say("Choose a value between 40 and 100 for your note: " + activeNode.choices[selectedChoice]);
-				} else if (activeNode.name == "amp") {
-					say("How loud do you want this to be? Choose a value between 0 and 1: " + activeNode.choices[selectedChoice]);
+					say("Choose a pitch between 40 and 100 for your note: " + activeNode.choices[selectedChoice]);
+				} else if (activeNode.name == "volume") {
+					say("How loud do you want this to be? Choose a value between 0 and 10: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "release") {
-					say("How slowly do you want to go from full amplitude to silence? Choose a value between 0 and 5: " + activeNode.choices[selectedChoice]);
+					say("How long do you want the note to be? Choose a value between 0 and 5: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "tempo") {
 					say("Choose a tempo for your piece between 60 and 180: " + activeNode.choices[selectedChoice]);
-				} else if (activeNode.name == "synth") {
-					say("Choose a synth: " + activeNode.choices[selectedChoice]);
-				} else if (activeNode.name == "fx name") {
+				} else if (activeNode.name == "change sound") {
+					say("Choose a sound to change to: " + activeNode.choices[selectedChoice]);
+				} else if (activeNode.name == "effect name") {
 					say("Choose an effect: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "sample") {
 					say("Choose a sample: " + activeNode.choices[selectedChoice]);

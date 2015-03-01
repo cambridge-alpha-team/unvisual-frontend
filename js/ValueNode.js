@@ -58,6 +58,8 @@ ValueNode.prototype.generateCode = function() {
             "end\n") +
             "end"
         );
+    } else if (this.name == "volume") {
+        sonicPi += "amp: " + (this.choice/10);
 	} else {
 		sonicPi += this.name + ": " + this.getValueCode();
 	}
@@ -97,6 +99,8 @@ ValueNode.prototype.generateHTML = function() {
             indent("return " + this.getValueHTML() + "\n") +
             "end"
         );
+    } else if (this.name == "volume") {
+        sonicPi += "amp: " + (this.choice/10);
 	} else {
 		sonicPi += this.name + ": " + this.getValueHTML();
 	}
