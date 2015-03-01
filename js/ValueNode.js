@@ -99,6 +99,8 @@ ValueNode.prototype.generateHTML = function() {
             indent("return " + this.getValueHTML() + "\n") +
             "end"
         );
+    } else if (this.name == "volume") {
+        sonicPi += "amp: " + this.getValueCode();
 	} else {
 		sonicPi += this.name + ": " + this.getValueHTML();
 	}
