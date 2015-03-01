@@ -131,6 +131,9 @@ Mousetrap.bind(['c'], function() {
 
 //shortcut to add a node
 Mousetrap.bind(['plus', '+'], function() {
+	// These two variables should always begin at their default values when this keyboard shortcut is used.
+	inLoop = false;
+	selectedCodePosition = 0;
 	if (['root', 'fx'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
@@ -273,6 +276,8 @@ Mousetrap.bind(['command+y', 'ctrl+y'], function() {
 Mousetrap.bind(['left', 'a', 'h'], function() {
 	switch (mode) {
 		case 'add': // add code
+			inLoop = false;
+			selectedCodePosition = 0;
 			mode = null;
 			say("Adding code cancelled. The currently selected bit of code is " + activeNode.readFull());
 			break;
@@ -398,6 +403,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			}
 			actionIndex++;
 			say(response + activeNode.readFull());
+			inLoop = false;
 			selectedCodePosition = 0;
 			mode = null;
 			break;
