@@ -458,7 +458,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 				} else if (activeNode.name == "note") {
 					say("Choose a pitch between 40 and 100 for your note: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "volume") {
-					say("How loud do you want this to be? Choose a value between 0 and 1: " + activeNode.choices[selectedChoice]);
+					say("How loud do you want this to be? Choose a value between 0 and 10: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "release") {
 					say("How long do you want the note to be? Choose a value between 0 and 5: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "tempo") {

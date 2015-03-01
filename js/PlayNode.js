@@ -8,7 +8,7 @@ function PlayNode(parent, childNumber) {
 		parent.children.push(this);
 	}
 	new ValueNode('note', this, 0, 60, 40, 100, 1);
-	new ValueNode('volume', this, 1, 1, 0, 1, 0.125); //TODO Fix rounding when set to 0.1
+	new ValueNode('volume', this, 1, 8, 0, 10, 1);
 	new ValueNode('release', this, 2, 1, 0, 5, 0.125);
 
 }
