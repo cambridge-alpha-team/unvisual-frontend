@@ -58,6 +58,8 @@ ValueNode.prototype.generateCode = function() {
             "end\n") +
             "end"
         );
+    } else if (this.name == "volume") {
+        sonicPi += "amp: " + this.getValueCode();
 	} else {
 		sonicPi += this.name + ": " + this.getValueCode();
 	}
