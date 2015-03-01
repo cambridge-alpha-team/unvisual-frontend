@@ -171,7 +171,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'effect') || activeNode.name == 'effect name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'effect' && activeNode.parent.name.substring(0, 4) != 'loop') || activeNode.name == 'effect name' || activeNode.parent instanceof PlayNode || (activeNode instanceof FXNode && activeNode.parent.children.length == 1 && activeNode.children.length == 1)) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -200,8 +200,10 @@ Mousetrap.bind(['minus', '-'], function() {
 				activeNode.parent.children.splice(index, 1);
 				if (index > 0) {
 					activeNode = activeNode.parent.children[index - 1];
-				} else {
+				} else if (activeNode.parent.children.length > 0) {
 					activeNode = activeNode.parent.children[index];
+				} else {
+					activeNode = activeNode.parent;
 				}
 			}
 			say("Code deleted. Press control+Z to undo. The currently selected bit of code is " + activeNode.readFull());
