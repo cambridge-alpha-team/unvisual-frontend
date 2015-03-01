@@ -20,7 +20,7 @@ ChoiceNode.prototype.readName = function() {
 ChoiceNode.prototype.generateCode = function() {
 	if(this.name == "sample") {
 		return "sample :" + this.choice;
-	} else if(this.name == "synth") {
+	} else if(this.name == "change sound") {
 		return "use_synth :" + this.choice;
 	} else {
 		return this.choice;
@@ -34,7 +34,7 @@ ChoiceNode.prototype.generateHTML = function() {
 	}
 	if (this.name == "sample") {
 		sonicPi += "sample :" + this.choice;
-	} else if (this.name == "synth") {
+	} else if (this.name == "change sound") {
 		sonicPi += "use_synth :" + this.choice;
 	} else {
 		sonicPi += this.choice;

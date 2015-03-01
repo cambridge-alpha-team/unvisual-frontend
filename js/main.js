@@ -1,4 +1,4 @@
-var codeTypes = ["loop", "play", "sleep", "effect", "synth", "sample"];
+var codeTypes = ["loop", "play", "sleep", "effect", "change sound", "sample"];
 var inLoop = false;
 
 var loopNumber = 1; // to uniquely name loops
@@ -135,15 +135,15 @@ Mousetrap.bind(['plus', '+'], function() {
 		if (mode == 'add') {
 				var ancestor = activeNode.parent;
 				if (ancestor instanceof RootNode) {
-					codeTypes = [ "loop", "play", "sleep", "synth", "sample" ];
+					codeTypes = [ "loop", "play", "sleep", "change sound", "sample" ];
 				}
 				while (!(ancestor instanceof RootNode)) {
 					if (ancestor instanceof LoopNode){
 						inLoop = true;
-						codeTypes = [ "play", "sleep", "effect", "synth", "sample" ];
+						codeTypes = [ "play", "sleep", "effect", "change sound", "sample" ];
 					} else {
 						inLoop = false;
-						codeTypes = [ "loop", "play", "sleep", "effect", "synth", "sample" ];
+						codeTypes = [ "loop", "play", "sleep", "effect", "change sound", "sample" ];
 					}		
 					ancestor = ancestor.parent;
 				}
@@ -337,7 +337,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 					break;
 				case 3: // synth
-					response += "New synth added after " + activeNode.readName() + '. ';
+					response += "New change sound added after " + activeNode.readName() + '. ';
 					activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 					break;
 				case 4: // sample
@@ -373,7 +373,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new FXNode(activeNode.parent);
 						break;
 					case 3: // synth
-						response += "New synth added after " + activeNode.readName() + '. ';
+						response += "New change sound added after " + activeNode.readName() + '. ';
 						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
 					case 4: // sample
@@ -413,7 +413,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new FXNode(activeNode.parent);
 						break;
 					case 4: // synth
-						response += "New synth added after " + activeNode.readName() + '. ';
+						response += "New change sound added after " + activeNode.readName() + '. ';
 						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
 					case 5: // sample
@@ -463,7 +463,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 					say("How long do you want the note to be? Choose a value between 0 and 5: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "tempo") {
 					say("Choose a tempo for your piece between 60 and 180: " + activeNode.choices[selectedChoice]);
-				} else if (activeNode.name == "synth") {
+				} else if (activeNode.name == "change sound") {
 					say("Choose a sound to change to: " + activeNode.choices[selectedChoice]);
 				} else if (activeNode.name == "effect name") {
 					say("Choose an effect: " + activeNode.choices[selectedChoice]);
