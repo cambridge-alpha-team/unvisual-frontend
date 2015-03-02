@@ -171,7 +171,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && !(activeNode instanceof FXNode) && !(activeNode instanceof LoopNode)) || activeNode.name == 'effect name' || activeNode.parent instanceof PlayNode) {
+	if (activeNode.name == "tempo" || activeNode.name == 'effect name' || activeNode.parent instanceof PlayNode) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
