@@ -60,6 +60,8 @@ ValueNode.prototype.generateCode = function() {
         );
     } else if (this.name == "volume") {
         sonicPi += "amp: " + this.getValueCode();
+    } else if (this.name == "length") {
+        sonicPi += "release: " + this.getValueCode();
 	} else {
 		sonicPi += this.name + ": " + this.getValueCode();
 	}
@@ -101,6 +103,8 @@ ValueNode.prototype.generateHTML = function() {
         );
     } else if (this.name == "volume") {
         sonicPi += "amp: " + this.getValueCode();
+    } else if (this.name == "length") {
+        sonicPi += "release: " + this.getValueCode();
 	} else {
 		sonicPi += this.name + ": " + this.getValueHTML();
 	}
