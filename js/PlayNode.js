@@ -8,8 +8,8 @@ function PlayNode(parent, childNumber) {
 		parent.children.push(this);
 	}
 	new ValueNode('note', this, 0, 60, 40, 100, 1);
+	new ValueNode('length', this, 2, 1, 0, 5, 0.125);
 	new ValueNode('volume', this, 1, 8, 0, 10, 1);
-	new ValueNode('release', this, 2, 1, 0, 5, 0.125);
 
 }
 inherits(PlayNode, Node);
