@@ -40,7 +40,7 @@ function unparentNode(childNode) {
 }
 
 function addChildNode(childNode, parentNode, index) {
-	if (childNode.name == 'effect') {
+	if (childNode instanceof FXNode) {
 		for (var i = 0; i < childNode.children.length; i++) {
 			childNode.children[i].parent = childNode;
 			var childIndex = childNode.parent.children.indexOf(childNode.children[i]);
@@ -72,7 +72,7 @@ function deleteNode(currentNode) {
 	// Determine the index of currentNode in the parent's array of children
 	var index = currentNode.parent.children.indexOf(currentNode);
 	if(index >= 0) {
-		if(currentNode.name == "effect") {
+		if(currentNode instanceof FXNode) {
 			// Parent currentNode's children to currentNode's parent
 			for(var i = 1; i < currentNode.children.length; i++) {
 				var childNode = currentNode.children[i];
@@ -134,12 +134,12 @@ Mousetrap.bind(['plus', '+'], function() {
 	// These two variables should always begin at their default values when this keyboard shortcut is used.
 	inLoop = false;
 	selectedCodePosition = 0;
-	if (['root', 'effect'].indexOf(activeNode.parent.name) < 0 && activeNode.parent.name.substr(0, 4) != 'loop') {
+	if (['root', 'effect'].indexOf(activeNode.parent.name) < 0 && !(activeNode.parent instanceof LoopNode)) {
 		say('You cannot add code here. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
-		mode = (mode == 'add' || mode == 'add-loop') ? null : activeNode.name.substr(0, 4) == 'loop' ? 'add-loop' : 'add';
-		codeTypes = activeNode.parent.name.substr(0, 4) == 'loop' ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+		mode = (mode == 'add' || mode == 'add-loop') ? null : activeNode instanceof LoopNode ? 'add-loop' : 'add';
+		codeTypes = activeNode.parent instanceof LoopNode ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
 		if (mode == 'add') {
 				var ancestor = activeNode.parent;
 				if (ancestor instanceof RootNode) {
@@ -171,7 +171,7 @@ Mousetrap.bind(['plus', '+'], function() {
 
 //shortcut to delete a node
 Mousetrap.bind(['minus', '-'], function() {
-	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && activeNode.name != 'effect' && activeNode.parent.name.substring(0, 4) != 'loop') || activeNode.name == 'effect name' || activeNode.parent instanceof PlayNode) {
+	if (activeNode.name == "tempo" || (activeNode.parent.children.length == 1 && !(activeNode instanceof FXNode) && !(activeNode instanceof LoopNode)) || activeNode.name == 'effect name' || activeNode.parent instanceof PlayNode) {
 		say('You cannot delete this code. ' + activeNode.readName() + ' is currently selected');
 		mode = null;
 	} else {
@@ -188,7 +188,7 @@ Mousetrap.bind(['minus', '-'], function() {
 			}
 			actionIndex++;
 			if(index >= 0) {
-				if(activeNode.name == "effect") {
+				if(activeNode instanceof FXNode) {
 					// Parent activeNode's children to activeNode's parent
 					for (var i = 1; i < activeNode.children.length; i++) {
 						var childNode = activeNode.children[i];
@@ -445,7 +445,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			break;
 		case 'add-loop': // choose where to add code relative to a loop
 			selectedCodeType = 0;
-			if (selectedCodePosition == 1 && activeNode.name.substr(0, 4) == 'loop') {
+			if (selectedCodePosition == 1 && activeNode instanceof LoopNode) {
 				inLoop = true;
 				codeTypes = [ "play", "sleep", "effect", "change sound", "sample" ];
 			} else {
@@ -507,7 +507,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if (activeNode.name == 'sample') {
+			if (activeNode instanceof ChoiceNode) {
 				if ((selectedChoice + 1) < activeNode.choices.length) {
 					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
 						actionRefs[actionIndex][2] = selectedChoice + 1;
@@ -566,7 +566,7 @@ Mousetrap.bind([ 'down', 's', 'j' ], function() {
 				activeNode = activeNode.parent.children[n + 1];
 				say(activeNode.readFull());
 			} else{
-				if (activeNode.parent.name == 'root')
+				if (activeNode.parent instanceof RootNode)
 					say("You are at the bottom of the page. " + activeNode.readFull());
 				else
 					say("You can only go up, in or out from this point. " + activeNode.readFull());
@@ -597,7 +597,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 			}
 			break;
 		case 'choose-value': //choices
-			if (activeNode.name == 'sample') {
+			if (activeNode instanceof ChoiceNode) {
 				if (0 < selectedChoice) {
 					if (actionRefs.length > 0 && actionIndex >= 0 && actions[actionIndex] == mode && actionRefs[actionIndex][0] == activeNode) {
 						actionRefs[actionIndex][2] = selectedChoice - 1;
@@ -655,7 +655,7 @@ Mousetrap.bind([ 'up', 'w', 'k' ], function() {
 				activeNode = activeNode.parent.children[n - 1];
 				say(activeNode.readFull());
 			} else {
-				if (activeNode.parent.name == 'root')
+				if (activeNode.parent instanceof RootNode)
 					say("You are at the top of the page. " + activeNode.readFull());
 				else 
 					say("You can only go down, in or out  from this point. " + activeNode.readFull());
