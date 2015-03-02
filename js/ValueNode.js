@@ -59,7 +59,7 @@ ValueNode.prototype.generateCode = function() {
             "end"
         );
     } else if (this.name == "volume") {
-        sonicPi += "amp: " + this.getValueCode();
+        sonicPi += "amp: " + (this.choice/10);
     } else if (this.name == "length") {
         sonicPi += "release: " + this.getValueCode();
 	} else {
@@ -102,7 +102,7 @@ ValueNode.prototype.generateHTML = function() {
             "end"
         );
     } else if (this.name == "volume") {
-        sonicPi += "amp: " + this.getValueCode();
+        sonicPi += "amp: " + (this.choice/10);
     } else if (this.name == "length") {
         sonicPi += "release: " + this.getValueCode();
 	} else {
