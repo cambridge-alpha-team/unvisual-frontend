@@ -369,7 +369,7 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						activeNode = new FXNode(newNodeParent);
 						break;
 					case 3: // synth
-						response += "New change sound added after " + newNodeMsg + activeNode.readName() + '. ';
+						response += "New change sound added " + newNodeMsg + activeNode.readName() + '. ';
 						activeNode = new SynthNode(newNodeParent, newNodeIndex);
 						break;
 					case 4: // sample
