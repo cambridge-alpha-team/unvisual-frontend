@@ -394,25 +394,11 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						response += "New rest added " + newNodeMsg + activeNode.readName() + '. ';
 						activeNode = new SleepNode(newNodeParent, newNodeIndex);
 						break;
-					case 3: // effect
-						response += "New effect added around " ;
-						for (var i = 0; i < activeNode.parent.children.length; i++){
-							response += activeNode.parent.children[i].readName();
-							if ( i == (activeNode.parent.children.length - 2))
-								response += " and ";
-							else if ( i == (newNodeParent.children.length - 1))
-								response += ". ";
-							else 
-								response += ", ";
-						}
-						
-						activeNode = new FXNode(newNodeParent);
-						break;
-					case 4: // synth
+					case 3: // synth
 						response += "New change sound added after " + activeNode.readName() + '. ';
 						activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
 						break;
-					case 5: // sample
+					case 4: // sample
 						response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
 						activeNode = new SampleNode(newNodeParent, newNodeIndex);
 						break;
