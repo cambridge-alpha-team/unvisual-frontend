@@ -18,8 +18,21 @@ ChoiceNode.prototype.readName = function() {
 };
 
 ChoiceNode.prototype.generateCode = function() {
-	if(this.name == "sample") {
-		return "sample :" + this.choice;
+	if (this.name == "tempo"){
+		return this.choice;
+	} else if(this.name == "sample") {
+		var beats;
+		if (this.name == "loop_amen" || this.name == "loop_breakbeat") {
+			beats = 4;
+		} else if (this.name == "loop_amen_full" || this.name == "loop_compus" || this.name == "loop_garzul" || this.name == "loop_mika"){
+			beats = 16;
+		} else if (this.name == "loop_industrial") {
+			beats = 2;
+		} else {
+			beats = 1; 
+		}
+		var want_duration = beats * 60;
+		return "sample :" + this.choice + ", rate: (sample_duration :" + this.choice + ") / (" + want_duration + "/current_bpm)" ;
 	} else if(this.name == "change sound") {
 		return "use_synth :" + this.choice;
 	} else {
