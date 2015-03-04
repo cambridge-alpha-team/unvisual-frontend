@@ -21,18 +21,11 @@ ChoiceNode.prototype.generateCode = function() {
 	if (this.name == "tempo"){
 		return this.choice;
 	} else if(this.name == "sample") {
-		var beats;
-		if (this.name == "loop_amen" || this.name == "loop_breakbeat") {
-			beats = 4;
-		} else if (this.name == "loop_amen_full" || this.name == "loop_compus" || this.name == "loop_garzul" || this.name == "loop_mika"){
-			beats = 16;
-		} else if (this.name == "loop_industrial") {
-			beats = 2;
+		if (this.choice.substr(0,5) == "loop_") {
+			return "sample :" + this.choice + ", rate: (current_bpm / 60.0) \nsleep (sample_duration :" + this.choice + ")" ;
 		} else {
-			beats = 1; 
+			return "sample :" + this.choice;
 		}
-		var want_duration = beats * 60;
-		return "sample :" + this.choice + ", rate: (sample_duration :" + this.choice + ") / (" + want_duration + "/current_bpm)" ;
 	} else if(this.name == "change sound") {
 		return "use_synth :" + this.choice;
 	} else {
@@ -46,7 +39,15 @@ ChoiceNode.prototype.generateHTML = function() {
 		sonicPi += '<pre style="font-size: 1em; border: black 2px solid; display: inline">';
 	}
 	if (this.name == "sample") {
-		sonicPi += "sample :" + this.choice;
+		if (this.choice.substr(0,5) == "loop_") {
+			if (this == activeNode){
+				sonicPi += "sample :" + this.choice + '</pre> \n<pre style="font-size: 1em; border: black 2px solid; display: inline">sleep (sample_duration :' + this.choice + ") </pre>" ;
+			} else {
+				sonicPi += "sample :" + this.choice + "\nsleep (sample_duration :" + this.choice + ")" ;
+			}
+		} else {
+			sonicPi += "sample :" + this.choice;
+		}
 	} else if (this.name == "change sound") {
 		sonicPi += "use_synth :" + this.choice;
 	} else {
