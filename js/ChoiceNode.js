@@ -18,8 +18,14 @@ ChoiceNode.prototype.readName = function() {
 };
 
 ChoiceNode.prototype.generateCode = function() {
-	if(this.name == "sample") {
-		return "sample :" + this.choice;
+	if (this.name == "tempo"){
+		return this.choice;
+	} else if(this.name == "sample") {
+		if (this.choice.substr(0,5) == "loop_") {
+			return "sample :" + this.choice + ", rate: (current_bpm / 60.0) \nsleep (sample_duration :" + this.choice + ")" ;
+		} else {
+			return "sample :" + this.choice;
+		}
 	} else if(this.name == "change sound") {
 		return "use_synth :" + this.choice;
 	} else {
@@ -33,7 +39,15 @@ ChoiceNode.prototype.generateHTML = function() {
 		sonicPi += '<pre style="font-size: 1em; border: black 2px solid; display: inline">';
 	}
 	if (this.name == "sample") {
-		sonicPi += "sample :" + this.choice;
+		if (this.choice.substr(0,5) == "loop_") {
+			if (this == activeNode){
+				sonicPi += "sample :" + this.choice + '</pre> \n<pre style="font-size: 1em; border: black 2px solid; display: inline">sleep (sample_duration :' + this.choice + ") </pre>" ;
+			} else {
+				sonicPi += "sample :" + this.choice + "\nsleep (sample_duration :" + this.choice + ")" ;
+			}
+		} else {
+			sonicPi += "sample :" + this.choice;
+		}
 	} else if (this.name == "change sound") {
 		sonicPi += "use_synth :" + this.choice;
 	} else {

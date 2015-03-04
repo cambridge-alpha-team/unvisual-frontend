@@ -1,4 +1,4 @@
-var codeTypes = ["loop", "play", "sleep", "effect", "change sound", "sample"];
+var codeTypes = ["loop", "play", "sleep", "effect", "change sound", "sample", "loopable sample"];
 var addFromLoopChoices = ["after the loop", "at the start of the loop"];
 var inLoop = false;
 
@@ -139,19 +139,19 @@ Mousetrap.bind(['plus', '+'], function() {
 		mode = null;
 	} else {
 		mode = (mode == 'add' || mode == 'add-loop') ? null : activeNode instanceof LoopNode ? 'add-loop' : 'add';
-		codeTypes = activeNode.parent instanceof LoopNode ? [ "play", "sleep", "fx", "synth", "sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample" ];
+		codeTypes = activeNode.parent instanceof LoopNode ? [ "play", "sleep", "fx", "synth", "sample", "loopable sample" ] : [ "loop", "play", "sleep", "fx", "synth", "sample", "loopable sample" ];
 		if (mode == 'add') {
 				var ancestor = activeNode.parent;
 				if (ancestor instanceof RootNode) {
-					codeTypes = [ "loop", "play", "sleep", "change sound", "sample" ];
+					codeTypes = [ "loop", "play", "sleep", "change sound", "sample", "loopable sample" ];
 				}
 				while (!(ancestor instanceof RootNode)) {
 					if (ancestor instanceof LoopNode){
 						inLoop = true;
-						codeTypes = [ "play", "sleep", "effect", "change sound", "sample" ];
+						codeTypes = [ "play", "sleep", "effect", "change sound", "sample", "loopable sample" ];
 					} else {
 						inLoop = false;
-						codeTypes = [ "loop", "play", "sleep", "effect", "change sound", "sample" ];
+						codeTypes = [ "loop", "play", "sleep", "effect", "change sound", "sample", "loopable sample" ];
 					}		
 					ancestor = ancestor.parent;
 				}
@@ -374,7 +374,16 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						break;
 					case 4: // sample
 						response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
-						activeNode = new SampleNode(newNodeParent, newNodeIndex);
+						var newSample = new SampleNode(newNodeParent, newNodeIndex);
+						newSample.choices = ['ambi_drone', 'ambi_lunar_land', 'bass_hit_c', 'bass_thick_c', 'bass_voxy_c', 'bd_boom',  'bd_pure', 'bd_sone', 'drum_cymbal_open', 'drum_cymbal_pedal', 'drum_cymbal_soft', 'elec_chime', 'guit_e_fifths', 'guit_e_slide', 'guit_harmonics',  'misc_burp', 'perc_bell'];
+						activeNode = newSample;
+						break;
+					case 5: // loopable sample
+						response += "New loopable sample added " + newNodeMsg + activeNode.readName()+ '. ';
+						var newLoopSample = new SampleNode(newNodeParent, newNodeIndex);
+						newLoopSample.choices = ['loop_amen', 'loop_amen_full', 'loop_amen_breakbeat', 'loop_compus', 'loop_garzul', 'loop_industrial', 'loop_mika'];
+						newLoopSample.choice = newLoopSample.choices[0];
+						activeNode = newLoopSample;
 						break;
 					default: // something's wrong
 						say("ERROR When attempting to add code.");
@@ -400,7 +409,16 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 						break;
 					case 4: // sample
 						response += "New sample added " + newNodeMsg + activeNode.readName() + '. ';
-						activeNode = new SampleNode(newNodeParent, newNodeIndex);
+						var newSample = new SampleNode(newNodeParent, newNodeIndex);
+						newSample.choices = ['ambi_drone', 'ambi_lunar_land', 'bass_hit_c', 'bass_thick_c', 'bass_voxy_c', 'bd_boom',  'bd_pure', 'bd_sone', 'drum_cymbal_open', 'drum_cymbal_pedal', 'drum_cymbal_soft', 'elec_chime', 'guit_e_fifths', 'guit_e_slide', 'guit_harmonics',  'misc_burp', 'perc_bell'];
+						activeNode = newSample;
+						break;
+					case 5: // loopable sample
+						response += "New loopable sample added " + newNodeMsg + activeNode.readName()+ '. ';
+						var newLoopSample = new SampleNode(newNodeParent, newNodeIndex);
+						newLoopSample.choices = ['loop_amen', 'loop_amen_full', 'loop_amen_breakbeat', 'loop_compus', 'loop_garzul', 'loop_industrial', 'loop_mika'];
+						newLoopSample.choice = newLoopSample.choices[0];
+						activeNode = newLoopSample;
 						break;
 					default: // something's wrong
 						say("ERROR When attempting to add code.");
@@ -433,10 +451,10 @@ Mousetrap.bind(['right', 'd', 'l'], function() {
 			selectedCodeType = 0;
 			if (selectedCodePosition == 1 && activeNode instanceof LoopNode) {
 				inLoop = true;
-				codeTypes = [ "play", "sleep", "effect", "change sound", "sample" ];
+				codeTypes = [ "play", "sleep", "effect", "change sound", "sample", "loopable sample" ];
 			} else {
 				inLoop = false;
-				codeTypes = [ "loop", "play", "sleep", "change sound", "sample" ];
+				codeTypes = [ "loop", "play", "sleep", "change sound", "sample", "loopable sample" ];
 			}
 			say("What do you want to add? " + codeTypes[selectedCodeType] + "; " + (selectedCodeType + 1) + " of " + codeTypes.length);
 			mode = 'add';
